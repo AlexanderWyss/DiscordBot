@@ -1,9 +1,9 @@
 package wyss.website.discordbot;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -14,61 +14,71 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 public class TrackScheduler extends AudioEventAdapter {
   private final AudioPlayer player;
 
-  private final List<AudioTrack> tracks = new LinkedList<>();
-  private ListIterator<AudioTrack> queue = tracks.listIterator();
+  private Deque<AudioTrack> queue = new LinkedBlockingDeque<>();
+  private Deque<AudioTrack> previousQueue = new LinkedBlockingDeque<>();
 
   private boolean repeatePlaylist = false;
   private boolean repeateSong = false;
+
+  private AudioTrack currentTrack = null;
 
   public TrackScheduler(AudioPlayer player) {
     this.player = player;
   }
 
   public void queue(AudioTrack track) {
-    int index = queue.nextIndex();
-    tracks.add(track);
-    queue = tracks.listIterator(index);
+    queue.addLast(track);
     updateAll();
   }
 
   public void queue(AudioPlaylist playlist) {
-    int index = queue.nextIndex();
     for (AudioTrack track : playlist.getTracks()) {
-      tracks.add(track);
+      queue.addLast(track);
     }
-    queue = tracks.listIterator(index);
     updateAll();
   }
 
   public void queueNext(AudioTrack track) {
-    queue.add(track);
-    queue.previous();
+    queue.addFirst(track);
     updateAll();
   }
 
   public void queueNext(AudioPlaylist playlist) {
-    int index = queue.nextIndex();
-    for (AudioTrack track : playlist.getTracks()) {
-      queue.add(track);
+    List<AudioTrack> tracks = playlist.getTracks();
+    for (int i = tracks.size() - 1; i >= 0; i--) {
+      queue.addFirst(tracks.get(i));
     }
-    queue = tracks.listIterator(index);
     updateAll();
   }
 
   public void nextTrack() {
-    if (queue.hasNext()) {
-      play(queue.next());
+    if (currentTrack != null) {
+      previousQueue.addLast(currentTrack);
+      currentTrack = null;
+    }
+    AudioTrack track;
+    if ((track = queue.pollFirst()) != null) {
+      play(track);
+      currentTrack = track;
     } else {
       if (repeatePlaylist) {
-        queue = tracks.listIterator();
+        Deque<AudioTrack> queueTemp = queue;
+        queue = previousQueue;
+        previousQueue = queueTemp;
         nextTrack();
       }
     }
   }
 
   public void previousTrack() {
-    if (queue.hasPrevious()) {
-      play(queue.previous());
+    if (currentTrack != null) {
+      queue.addFirst(currentTrack);
+      currentTrack = null;
+    }
+    AudioTrack track;
+    if ((track = previousQueue.pollLast()) != null) {
+      play(track);
+      currentTrack = track;
     } else {
       nextTrack();
     }
@@ -79,14 +89,17 @@ public class TrackScheduler extends AudioEventAdapter {
   }
 
   public void clear() {
-    tracks.clear();
-    queue = tracks.listIterator();
+    queue.clear();
+    previousQueue.clear();
+    currentTrack = null;
+    player.stopTrack();
+    updateAll();
   }
 
   @Override
   public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
     if (repeateSong && endReason.equals(AudioTrackEndReason.FINISHED)) {
-      previousTrack();
+      play(currentTrack);
     } else if (endReason.mayStartNext) {
       nextTrack();
     }
@@ -117,11 +130,11 @@ public class TrackScheduler extends AudioEventAdapter {
   }
 
   public int getNumberOfSongsInQueue() {
-    return tracks.size() - queue.previousIndex();
+    return queue.size();
   }
 
   public int getNumberOfSongsPreviouslyInQueue() {
-    return queue.previousIndex();
+    return previousQueue.size();
   }
 
   public void togglePause() {
