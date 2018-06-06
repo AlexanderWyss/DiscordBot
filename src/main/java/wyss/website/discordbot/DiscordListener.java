@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
@@ -42,6 +45,7 @@ import wyss.website.discordbot.commands.MusicSetVolumeCommand;
 import wyss.website.discordbot.commands.ShutdownCommand;
 
 public class DiscordListener {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DiscordListener.class);
 
   private AudioPlayerManager playerManager;
   private Map<Long, GuildMusicManager> musicManagers;
@@ -105,10 +109,12 @@ public class DiscordListener {
   @EventSubscriber
   public void onReactionEvent(ReactionEvent event) {
     IUser ourUser = event.getClient().getOurUser();
-    if (ourUser.equals(event.getMessage().getAuthor()) && !ourUser.equals(event.getUser())) {
+    IUser user = event.getUser();
+    if (ourUser.equals(event.getMessage().getAuthor()) && !ourUser.equals(user)) {
       GuildMusicManager guildAudioPlayer = getGuildAudioPlayer(event.getGuild());
       TrackScheduler scheduler = guildAudioPlayer.scheduler;
       ReactionEmoji emoji = event.getReaction().getEmoji();
+      LOGGER.debug("Reaction recived from {} ({})", user.getName(), user.getStringID());
       if (MusicPanel.ARROW_BACK.equals(emoji)) {
         scheduler.previousTrack();
       } else if (MusicPanel.PAUSE_PLAY.equals(emoji)) {

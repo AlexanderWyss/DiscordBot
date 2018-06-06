@@ -5,10 +5,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import wyss.website.discordbot.DiscordListener;
 
 public abstract class Command {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
   public static String COMMAND_PREFIX = "!";
   public static String ESCAPED_COMMAND_PREFIX = COMMAND_PREFIX;
@@ -46,6 +51,7 @@ public abstract class Command {
         for (int i = 1; i <= groupCount; i++) {
           params.add(matcher.group(i));
         }
+        LOGGER.debug("Executing command {} with params {}", getClass(), params);
         execute(event, discordListener, params);
         return true;
       }

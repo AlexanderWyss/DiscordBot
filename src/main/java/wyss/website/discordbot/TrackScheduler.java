@@ -5,6 +5,9 @@ import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -12,6 +15,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 public class TrackScheduler extends AudioEventAdapter {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(TrackScheduler.class);
+
   private final AudioPlayer player;
 
   private Deque<AudioTrack> queue = new LinkedBlockingDeque<>();
@@ -164,6 +170,7 @@ public class TrackScheduler extends AudioEventAdapter {
   public void setRepeatePlaylist(boolean repeatePlaylist) {
     this.repeatePlaylist = repeatePlaylist;
     updateAll();
+    LOGGER.debug("Set repeatPlaylist to {}", repeatePlaylist);
   }
 
   public boolean isRepeatePlaylistSet() {
@@ -177,6 +184,7 @@ public class TrackScheduler extends AudioEventAdapter {
   public void setRepeateSong(boolean repeateSong) {
     this.repeateSong = repeateSong;
     updateAll();
+    LOGGER.debug("Set repeatSong to {}", repeateSong);
   }
 
   public boolean isRepeateSongSet() {
