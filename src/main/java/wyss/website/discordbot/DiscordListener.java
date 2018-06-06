@@ -136,4 +136,10 @@ public class DiscordListener {
   public AudioPlayerManager getPlayerManager() {
     return playerManager;
   }
+
+  public List<String> getAdmins() {
+    List<String> admins = new ArrayList<>();
+    admins.add("289059059829833728");
+    return admins;
+  }
 }

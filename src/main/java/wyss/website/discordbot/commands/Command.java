@@ -36,16 +36,19 @@ public abstract class Command {
   }
 
   public boolean executeIfmatches(MessageReceivedEvent event, DiscordListener discordListener) {
-    Pattern pattern = Pattern.compile(ESCAPED_COMMAND_PREFIX + regexPattern, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-    Matcher matcher = pattern.matcher(event.getMessage().getContent().trim());
-    if (matcher.matches()) {
-      int groupCount = matcher.groupCount();
-      List<String> params = new ArrayList<>();
-      for (int i = 1; i <= groupCount; i++) {
-        params.add(matcher.group(i));
+    if (!isSecret || discordListener.getAdmins().contains(event.getAuthor().getStringID())) {
+      Pattern pattern = Pattern.compile(ESCAPED_COMMAND_PREFIX + regexPattern,
+          Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+      Matcher matcher = pattern.matcher(event.getMessage().getContent().trim());
+      if (matcher.matches()) {
+        int groupCount = matcher.groupCount();
+        List<String> params = new ArrayList<>();
+        for (int i = 1; i <= groupCount; i++) {
+          params.add(matcher.group(i));
+        }
+        execute(event, discordListener, params);
+        return true;
       }
-      execute(event, discordListener, params);
-      return true;
     }
     return false;
   }
