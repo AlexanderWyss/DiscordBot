@@ -35,7 +35,7 @@ public abstract class Command {
     this(regexPattern, regexPattern, false);
   }
 
-  public void executeIfmatches(MessageReceivedEvent event, DiscordListener discordListener) {
+  public boolean executeIfmatches(MessageReceivedEvent event, DiscordListener discordListener) {
     Pattern pattern = Pattern.compile(ESCAPED_COMMAND_PREFIX + regexPattern, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     Matcher matcher = pattern.matcher(event.getMessage().getContent().trim());
     if (matcher.matches()) {
@@ -45,7 +45,9 @@ public abstract class Command {
         params.add(matcher.group(i));
       }
       execute(event, discordListener, params);
+      return true;
     }
+    return false;
   }
 
   public String getCommandPatternText() {

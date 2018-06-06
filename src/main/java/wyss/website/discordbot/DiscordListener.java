@@ -18,6 +18,7 @@ import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.StatusType;
+import sx.blah.discord.util.RequestBuffer;
 import wyss.website.discordbot.commands.AnnounceCommand;
 import wyss.website.discordbot.commands.Command;
 import wyss.website.discordbot.commands.HelloCommand;
@@ -45,6 +46,9 @@ public class DiscordListener {
   private AudioPlayerManager playerManager;
   private Map<Long, GuildMusicManager> musicManagers;
 
+  private List<Command> commands;
+  private HelpCommand helpCommand = new HelpCommand();;
+
   @EventSubscriber
   public void onReady(ReadyEvent event) {
     musicManagers = new HashMap<>();
@@ -54,7 +58,6 @@ public class DiscordListener {
     AudioSourceManagers.registerLocalSource(playerManager);
 
     commands = new ArrayList<>();
-    HelpCommand helpCommand = new HelpCommand();
     commands.add(helpCommand);
     commands.add(new HelloCommand());
     commands.add(new JoinCommand());
@@ -86,12 +89,16 @@ public class DiscordListener {
     return musicManager;
   }
 
-  private List<Command> commands;
-
   @EventSubscriber
   public void onMessageReceived(MessageReceivedEvent event) {
+    boolean commandRecognized = false;
     for (Command command : commands) {
-      command.executeIfmatches(event, this);
+      boolean matches = command.executeIfmatches(event, this);
+      commandRecognized = matches || commandRecognized;
+    }
+    if (!commandRecognized) {
+      RequestBuffer.request(() -> event.getChannel()
+          .sendMessage("Command not recognized. Type \"" + helpCommand.getCommandPatternText() + "\" for help."));
     }
   }
 
