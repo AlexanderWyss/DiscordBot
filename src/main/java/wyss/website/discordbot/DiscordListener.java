@@ -14,8 +14,10 @@ import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.reaction.ReactionEvent;
 import sx.blah.discord.handle.impl.obj.ReactionEmoji;
+import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.StatusType;
 import wyss.website.discordbot.commands.AnnounceCommand;
 import wyss.website.discordbot.commands.Command;
 import wyss.website.discordbot.commands.HelloCommand;
@@ -52,7 +54,8 @@ public class DiscordListener {
     AudioSourceManagers.registerLocalSource(playerManager);
 
     commands = new ArrayList<>();
-    commands.add(new HelpCommand());
+    HelpCommand helpCommand = new HelpCommand();
+    commands.add(helpCommand);
     commands.add(new HelloCommand());
     commands.add(new JoinCommand());
     commands.add(new LeaveCommand());
@@ -72,6 +75,9 @@ public class DiscordListener {
     commands.add(new MusicDurationCommand());
     commands.add(new AnnounceCommand());
     commands.add(new ShutdownCommand());
+
+    event.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING,
+        helpCommand.getCommandPatternDescription());
   }
 
   public synchronized GuildMusicManager getGuildAudioPlayer(IGuild guild) {
