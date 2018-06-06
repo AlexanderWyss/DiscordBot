@@ -6,7 +6,7 @@ import wyss.website.discordbot.MusicPanel;
 
 public class MusicPanelCommand implements Command {
 
-  private static final String COMMAND_TEXT = "Musicbot Panel";
+  private static final String COMMAND_TEXT = "MusicBot Panel";
   private MusicPanel oldPanel = null;
 
   @Override

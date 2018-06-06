@@ -125,6 +125,7 @@ public class TrackScheduler extends AudioEventAdapter {
     nextTrack();
   }
 
+  // not current track form this instance must be playingtrack from player
   public AudioTrack getCurrentTrack() {
     return player.getPlayingTrack();
   }

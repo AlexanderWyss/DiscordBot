@@ -24,6 +24,7 @@ import wyss.website.discordbot.commands.JoinCommand;
 import wyss.website.discordbot.commands.LeaveCommand;
 import wyss.website.discordbot.commands.MusicClearCommand;
 import wyss.website.discordbot.commands.MusicContinueCommand;
+import wyss.website.discordbot.commands.MusicDurationCommand;
 import wyss.website.discordbot.commands.MusicNextCommand;
 import wyss.website.discordbot.commands.MusicPanelCommand;
 import wyss.website.discordbot.commands.MusicPauseCommand;
@@ -68,6 +69,7 @@ public class DiscordListener {
     commands.add(new MusicRepeateCommand());
     commands.add(new MusicRepeateSongCommand());
     commands.add(new MusicPanelCommand());
+    commands.add(new MusicDurationCommand());
     commands.add(new AnnounceCommand());
     commands.add(new ShutdownCommand());
   }
@@ -111,6 +113,8 @@ public class DiscordListener {
         scheduler.toggleRepeatePlaylist();
       } else if (MusicPanel.REPEATE_ONE_EMOJI.equals(emoji)) {
         scheduler.toggleRepeateSong();
+      } else if (MusicPanel.DURATION.equals(emoji)) {
+        new DurationPanel(scheduler.getCurrentTrack()).send(event.getChannel());
       }
     }
   }

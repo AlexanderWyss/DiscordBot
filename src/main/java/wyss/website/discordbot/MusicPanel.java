@@ -25,6 +25,7 @@ public class MusicPanel implements Observer {
   public static final ReactionEmoji VOLUME_UP = ReactionEmoji.of("\uD83D\uDD0A");
   public static final ReactionEmoji REPEATE_EMOJI = ReactionEmoji.of(REPEATE);
   public static final ReactionEmoji REPEATE_ONE_EMOJI = ReactionEmoji.of(REPEATE_ONE);
+  public static final ReactionEmoji DURATION = ReactionEmoji.of("\u231A");
 
   private IChannel channel;
   private IMessage sentMessage;
@@ -46,6 +47,7 @@ public class MusicPanel implements Observer {
     RequestBuffer.request(() -> sentMessage.addReaction(VOLUME_UP)).get();
     RequestBuffer.request(() -> sentMessage.addReaction(REPEATE_EMOJI)).get();
     RequestBuffer.request(() -> sentMessage.addReaction(REPEATE_ONE_EMOJI)).get();
+    RequestBuffer.request(() -> sentMessage.addReaction(DURATION)).get();
   }
 
   private void registerListeners() {
@@ -75,8 +77,8 @@ public class MusicPanel implements Observer {
       embedObject.appendField("Duration", DurationFormatUtils.formatDuration(currentTrack.getDuration(), "mm:ss"),
           false);
     }
-    embedObject.appendField("Songs in queue",
-        scheduler.getNumberOfSongsPreviouslyInQueue() + " played previously | " + scheduler.getNumberOfSongsInQueue() + " in Queue", false);
+    embedObject.appendField("Songs in queue", scheduler.getNumberOfSongsPreviouslyInQueue() + " played previously | "
+        + scheduler.getNumberOfSongsInQueue() + " in Queue", false);
     embedObject.appendField("Volume", guildAudioPlayer.getVolume() + "%", false);
     String repeateContent = (scheduler.isRepeatePlaylistSet() ? REPEATE : "")
         + (scheduler.isRepeateSongSet() ? REPEATE_ONE : "");
