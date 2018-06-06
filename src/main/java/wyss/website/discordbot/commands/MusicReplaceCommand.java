@@ -29,14 +29,14 @@ public class MusicReplaceCommand implements Command {
           public void trackLoaded(AudioTrack track) {
             musicManager.scheduler.clear();
             musicManager.scheduler.queue(track);
-            musicManager.scheduler.forward();
+            musicManager.scheduler.nextTrack();
           }
 
           @Override
           public void playlistLoaded(AudioPlaylist playlist) {
             musicManager.scheduler.clear();
             musicManager.scheduler.queue(playlist);
-            musicManager.scheduler.forward();
+            musicManager.scheduler.nextTrack();
           }
         });
 

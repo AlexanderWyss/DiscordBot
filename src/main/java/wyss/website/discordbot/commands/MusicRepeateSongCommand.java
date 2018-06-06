@@ -21,7 +21,7 @@ public class MusicRepeateSongCommand implements Command {
     IChannel channel = event.getChannel();
     GuildMusicManager musicManager = discordListener.getGuildAudioPlayer(channel.getGuild());
     boolean value = "y".equals(param);
-    musicManager.scheduler.repeateSong(value);
+    musicManager.scheduler.setRepeateSong(value);
     RequestBuffer.request(() -> channel.sendMessage("Song repeate set to " + value));
   }
 

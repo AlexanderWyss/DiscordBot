@@ -28,13 +28,13 @@ public class MusicPlayCommand implements Command {
           @Override
           public void trackLoaded(AudioTrack track) {
             musicManager.scheduler.queueNext(track);
-            musicManager.scheduler.forward();
+            musicManager.scheduler.nextTrack();
           }
 
           @Override
           public void playlistLoaded(AudioPlaylist playlist) {
             musicManager.scheduler.queueNext(playlist);
-            musicManager.scheduler.forward();
+            musicManager.scheduler.nextTrack();
           }
         });
   }

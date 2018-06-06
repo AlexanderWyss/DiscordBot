@@ -98,11 +98,11 @@ public class DiscordListener {
       TrackScheduler scheduler = guildAudioPlayer.scheduler;
       ReactionEmoji emoji = event.getReaction().getEmoji();
       if (MusicPanel.ARROW_BACK.equals(emoji)) {
-        scheduler.previous();
+        scheduler.previousTrack();
       } else if (MusicPanel.PAUSE_PLAY.equals(emoji)) {
         scheduler.togglePause();
       } else if (MusicPanel.ARROW_FORWARD.equals(emoji)) {
-        scheduler.forward();
+        scheduler.nextTrack();
       } else if (MusicPanel.VOLUME_DOWN.equals(emoji)) {
         guildAudioPlayer.volumeDown();
       } else if (MusicPanel.VOLUME_UP.equals(emoji)) {

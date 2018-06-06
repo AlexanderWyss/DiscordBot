@@ -76,10 +76,10 @@ public class MusicPanel implements Observer {
           false);
     }
     embedObject.appendField("Songs in queue",
-        scheduler.getNumberOfSongsPreviouslyInQueue() + " played previously | " + scheduler.getSongsNumberInQueue() + " in Queue", false);
+        scheduler.getNumberOfSongsPreviouslyInQueue() + " played previously | " + scheduler.getNumberOfSongsInQueue() + " in Queue", false);
     embedObject.appendField("Volume", guildAudioPlayer.getVolume() + "%", false);
-    String repeateContent = (scheduler.isRepeatePlaylist() ? REPEATE : "")
-        + (scheduler.isRepeateSong() ? REPEATE_ONE : "");
+    String repeateContent = (scheduler.isRepeatePlaylistSet() ? REPEATE : "")
+        + (scheduler.isRepeateSongSet() ? REPEATE_ONE : "");
     embedObject.appendField("Repeat", repeateContent.isEmpty() ? "None" : repeateContent, false);
     return embedObject.build();
   }

@@ -1,7 +1,9 @@
 package wyss.website.discordbot;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -9,123 +11,84 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
-/**
- * This class schedules tracks for the audio player. It contains the queue of
- * tracks.
- */
-// TODO rewrite
 public class TrackScheduler extends AudioEventAdapter {
   private final AudioPlayer player;
-  private final List<AudioTrack> queue;
-  private int nextIndex = 0;
+
+  private final List<AudioTrack> tracks = new LinkedList<>();
+  private ListIterator<AudioTrack> queue = tracks.listIterator();
+
   private boolean repeatePlaylist = false;
   private boolean repeateSong = false;
 
   public TrackScheduler(AudioPlayer player) {
     this.player = player;
-    this.queue = new ArrayList<>();
   }
 
   public void queue(AudioTrack track) {
-    queue.add(track);
+    int index = queue.nextIndex();
+    tracks.add(track);
+    queue = tracks.listIterator(index);
     updateAll();
   }
 
   public void queue(AudioPlaylist playlist) {
+    int index = queue.nextIndex();
     for (AudioTrack track : playlist.getTracks()) {
-      queue.add(track);
+      tracks.add(track);
     }
+    queue = tracks.listIterator(index);
     updateAll();
   }
 
   public void queueNext(AudioTrack track) {
-    queue.add(nextIndex, track);
+    queue.add(track);
+    queue.previous();
     updateAll();
   }
 
   public void queueNext(AudioPlaylist playlist) {
-    List<AudioTrack> tracks = playlist.getTracks();
-    for (int i = 0; i < tracks.size(); i++) {
-      queue.add(nextIndex + i, tracks.get(i));
+    int index = queue.nextIndex();
+    for (AudioTrack track : playlist.getTracks()) {
+      queue.add(track);
     }
+    queue = tracks.listIterator(index);
     updateAll();
   }
 
-  public void forward() {
-    if (nextIndex < queue.size()) {
-      play(nextIndex, false);
-      continuePlaying();
-      nextIndex++;
+  public void nextTrack() {
+    if (queue.hasNext()) {
+      play(queue.next());
     } else {
       if (repeatePlaylist) {
-        nextIndex = 0;
-        forward();
-      } else {
-        nextIndex = queue.size();
+        queue = tracks.listIterator();
+        nextTrack();
       }
     }
   }
 
-  public void previous() {
-    nextIndex -= 2;
-    if (nextIndex >= 0) {
-      play(nextIndex, false);
-      continuePlaying();
-      nextIndex++;
+  public void previousTrack() {
+    if (queue.hasPrevious()) {
+      play(queue.previous());
     } else {
-      nextIndex = 0;
-      forward();
+      nextTrack();
     }
   }
 
-  public void togglePause() {
-    setPaused(!player.isPaused());
-  }
-
-  public void pausePlaying() {
-    setPaused(true);
-  }
-
-  public void continuePlaying() {
-    setPaused(false);
-  }
-
-  public boolean isPaused() {
-    return player.isPaused();
-  }
-
-  public void setPaused(boolean value) {
-    player.setPaused(value);
-    if (getCurrentTrack() == null) {
-      nextIndex--;
-      forward();
-    }
-  }
-
-  // TODO remove
-  public void play(int index, boolean notForce) {
-    AudioTrack audioTrack = queue.get(index);
-    player.startTrack(audioTrack.makeClone(), notForce);
-    if (queue.size() > 1000) {
-      while (index > 0) {
-        queue.remove(0);
-        index--;
-      }
-    }
+  private void play(AudioTrack track) {
+    player.startTrack(track.makeClone(), false);
   }
 
   public void clear() {
-    queue.clear();
-    nextIndex = 0;
+    tracks.clear();
+    queue = tracks.listIterator();
   }
 
   @Override
   public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
     if (repeateSong && endReason.equals(AudioTrackEndReason.FINISHED)) {
-      nextIndex--;
-    }
-    if (endReason.mayStartNext) {
-      forward();
+      previousTrack();
+    } else if (endReason.mayStartNext) {
+      nextTrack();
     }
   }
 
@@ -146,7 +109,68 @@ public class TrackScheduler extends AudioEventAdapter {
 
   @Override
   public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-    forward();
+    nextTrack();
+  }
+
+  public AudioTrack getCurrentTrack() {
+    return player.getPlayingTrack();
+  }
+
+  public int getNumberOfSongsInQueue() {
+    return tracks.size() - queue.previousIndex();
+  }
+
+  public int getNumberOfSongsPreviouslyInQueue() {
+    return queue.previousIndex();
+  }
+
+  public void togglePause() {
+    setPaused(!player.isPaused());
+  }
+
+  public void pausePlaying() {
+    setPaused(true);
+  }
+
+  public void continuePlaying() {
+    setPaused(false);
+  }
+
+  public boolean isPaused() {
+    return player.isPaused();
+  }
+
+  public void setPaused(boolean paused) {
+    player.setPaused(paused);
+    if (!paused && getCurrentTrack() == null) {
+      previousTrack();
+    }
+  }
+
+  public void setRepeatePlaylist(boolean repeatePlaylist) {
+    this.repeatePlaylist = repeatePlaylist;
+    updateAll();
+  }
+
+  public boolean isRepeatePlaylistSet() {
+    return repeatePlaylist;
+  }
+
+  public void toggleRepeatePlaylist() {
+    setRepeatePlaylist(!isRepeatePlaylistSet());
+  }
+
+  public void setRepeateSong(boolean repeateSong) {
+    this.repeateSong = repeateSong;
+    updateAll();
+  }
+
+  public boolean isRepeateSongSet() {
+    return repeateSong;
+  }
+
+  public void toggleRepeateSong() {
+    setRepeateSong(!isRepeateSongSet());
   }
 
   private List<Observer> observers = new ArrayList<>();
@@ -163,43 +187,5 @@ public class TrackScheduler extends AudioEventAdapter {
 
   public void removeListener(Observer observer) {
     observers.remove(observer);
-  }
-
-  public AudioTrack getCurrentTrack() {
-    return player.getPlayingTrack();
-  }
-
-  public int getSongsNumberInQueue() {
-    return queue.size() - nextIndex;
-  }
-
-  public int getNumberOfSongsPreviouslyInQueue() {
-    return nextIndex - 1;
-  }
-
-  public void repeatePlaylist(boolean repeatePlaylist) {
-    this.repeatePlaylist = repeatePlaylist;
-    updateAll();
-  }
-
-  public void repeateSong(boolean repeateSong) {
-    this.repeateSong = repeateSong;
-    updateAll();
-  }
-
-  public boolean isRepeatePlaylist() {
-    return repeatePlaylist;
-  }
-
-  public boolean isRepeateSong() {
-    return repeateSong;
-  }
-
-  public void toggleRepeatePlaylist() {
-    repeatePlaylist(!isRepeatePlaylist());
-  }
-
-  public void toggleRepeateSong() {
-    repeateSong(!isRepeateSong());
   }
 }

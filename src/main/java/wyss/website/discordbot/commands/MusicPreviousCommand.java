@@ -14,7 +14,7 @@ public class MusicPreviousCommand implements Command {
 
 	@Override
 	public void execute(MessageReceivedEvent event, DiscordListener discordListener) {
-		discordListener.getGuildAudioPlayer(event.getGuild()).scheduler.previous();
+		discordListener.getGuildAudioPlayer(event.getGuild()).scheduler.previousTrack();
 	}
 
 	@Override
