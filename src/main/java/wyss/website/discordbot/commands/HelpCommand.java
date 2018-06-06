@@ -25,6 +25,7 @@ public class HelpCommand extends Command {
             .append(System.lineSeparator());
       }
     }
+    builder.append(System.lineSeparator()).append("All commands are case insensitiv");
     RequestBuffer.request(() -> event.getChannel()
         .sendMessage(new EmbedBuilder().withTitle("Command - Description").appendDesc(builder.toString()).build()));
   }
