@@ -95,14 +95,16 @@ public class DiscordListener {
 
   @EventSubscriber
   public void onMessageReceived(MessageReceivedEvent event) {
-    boolean commandRecognized = false;
-    for (Command command : commands) {
-      boolean matches = command.executeIfmatches(event, this);
-      commandRecognized = matches || commandRecognized;
-    }
-    if (!commandRecognized) {
-      RequestBuffer.request(() -> event.getChannel()
-          .sendMessage("Command not recognized. Type \"" + helpCommand.getCommandPatternText() + "\" for help."));
+    if (event.getMessage().getContent().startsWith(Command.COMMAND_PREFIX)) {
+      boolean commandRecognized = false;
+      for (Command command : commands) {
+        boolean matches = command.executeIfmatches(event, this);
+        commandRecognized = matches || commandRecognized;
+      }
+      if (!commandRecognized) {
+        RequestBuffer.request(() -> event.getChannel()
+            .sendMessage("Command not recognized. Type \"" + helpCommand.getCommandPatternText() + "\" for help."));
+      }
     }
   }
 
