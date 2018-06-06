@@ -76,8 +76,7 @@ public class DiscordListener {
     commands.add(new AnnounceCommand());
     commands.add(new ShutdownCommand());
 
-    event.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING,
-        helpCommand.getCommandPatternDescription());
+    event.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING, helpCommand.getCommandPatternText());
   }
 
   public synchronized GuildMusicManager getGuildAudioPlayer(IGuild guild) {
@@ -92,9 +91,7 @@ public class DiscordListener {
   @EventSubscriber
   public void onMessageReceived(MessageReceivedEvent event) {
     for (Command command : commands) {
-      if (command.matches(event, this)) {
-        command.execute(event, this);
-      }
+      command.executeIfmatches(event, this);
     }
   }
 

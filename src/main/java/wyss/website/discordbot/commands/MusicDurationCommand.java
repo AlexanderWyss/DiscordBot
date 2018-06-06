@@ -1,5 +1,7 @@
 package wyss.website.discordbot.commands;
 
+import java.util.List;
+
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -8,17 +10,16 @@ import sx.blah.discord.util.RequestBuffer;
 import wyss.website.discordbot.DiscordListener;
 import wyss.website.discordbot.DurationPanel;
 
-public class MusicDurationCommand implements Command {
+public class MusicDurationCommand extends Command {
 
-  private static final String COMMAND_TEXT = "MusicBot duration";
+  private static final String COMMAND_PATTERN = "duration";
 
-  @Override
-  public boolean matches(MessageReceivedEvent event, DiscordListener discordListener) {
-    return event.getMessage().getFormattedContent().equalsIgnoreCase(COMMAND_TEXT);
+  public MusicDurationCommand() {
+    super(COMMAND_PATTERN);
   }
 
   @Override
-  public void execute(MessageReceivedEvent event, DiscordListener discordListener) {
+  public void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
     AudioTrack currentTrack = discordListener.getGuildAudioPlayer(event.getGuild()).scheduler.getCurrentTrack();
     IChannel channel = event.getChannel();
     if (currentTrack != null) {
@@ -26,11 +27,6 @@ public class MusicDurationCommand implements Command {
     } else {
       RequestBuffer.request(() -> channel.sendMessage("No song playing"));
     }
-  }
-
-  @Override
-  public String getCommandPatternDescription() {
-    return COMMAND_TEXT;
   }
 
   @Override

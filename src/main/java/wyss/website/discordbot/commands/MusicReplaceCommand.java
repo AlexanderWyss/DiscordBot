@@ -1,5 +1,7 @@
 package wyss.website.discordbot.commands;
 
+import java.util.List;
+
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
@@ -8,18 +10,18 @@ import sx.blah.discord.handle.obj.IChannel;
 import wyss.website.discordbot.DiscordListener;
 import wyss.website.discordbot.GuildMusicManager;
 
-public class MusicReplaceCommand implements Command {
+public class MusicReplaceCommand extends Command {
 
-  private static final String COMMAND_TEXT = "MusicBot replace ";
+  private static final String COMMAND_PATTERN = "replace (.+)";
+  private static final String COMMAND_PATTERN_DESCRIPTION = "replace <url>";
 
-  @Override
-  public boolean matches(MessageReceivedEvent event, DiscordListener discordListener) {
-    return event.getMessage().getFormattedContent().toUpperCase().startsWith(COMMAND_TEXT.toUpperCase());
+  public MusicReplaceCommand() {
+    super(COMMAND_PATTERN, COMMAND_PATTERN_DESCRIPTION);
   }
 
   @Override
-  public void execute(MessageReceivedEvent event, DiscordListener discordListener) {
-    String url = event.getMessage().getFormattedContent().substring(COMMAND_TEXT.length()).trim();
+  public void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
+    String url = params.get(0);
     IChannel channel = event.getChannel();
     GuildMusicManager musicManager = discordListener.getGuildAudioPlayer(channel.getGuild());
     discordListener.getPlayerManager().loadItemOrdered(musicManager, url,
@@ -40,11 +42,6 @@ public class MusicReplaceCommand implements Command {
           }
         });
 
-  }
-
-  @Override
-  public String getCommandPatternDescription() {
-    return COMMAND_TEXT + "<url>";
   }
 
   @Override

@@ -1,20 +1,62 @@
 package wyss.website.discordbot.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import wyss.website.discordbot.DiscordListener;
 
-public interface Command {
+public abstract class Command {
 
-  boolean matches(MessageReceivedEvent event, DiscordListener discordListener);
+  public static String COMMAND_PREFIX = "!";
+  public static String ESCAPED_COMMAND_PREFIX = COMMAND_PREFIX;
 
-  void execute(MessageReceivedEvent event, DiscordListener discordListener);
+  private String regexPattern;
+  private String commandPatternText;
+  private boolean isSecret;
 
-  String getCommandPatternDescription();
-
-  String getDescription();
-
-  default boolean isSecret() {
-    return false;
+  public Command(String regexPattern, String commandPatternText, boolean isSecret) {
+    this.regexPattern = regexPattern;
+    this.commandPatternText = commandPatternText;
+    this.isSecret = isSecret;
   }
 
+  public Command(String regexPattern, String commandPatternText) {
+    this(regexPattern, commandPatternText, false);
+  }
+
+  public Command(String regexPattern, boolean isSecret) {
+    this(regexPattern, regexPattern, isSecret);
+  }
+
+  public Command(String regexPattern) {
+    this(regexPattern, regexPattern, false);
+  }
+
+  public void executeIfmatches(MessageReceivedEvent event, DiscordListener discordListener) {
+    Pattern pattern = Pattern.compile(ESCAPED_COMMAND_PREFIX + regexPattern, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    Matcher matcher = pattern.matcher(event.getMessage().getContent().trim());
+    if (matcher.matches()) {
+      int groupCount = matcher.groupCount();
+      List<String> params = new ArrayList<>();
+      for (int i = 1; i <= groupCount; i++) {
+        params.add(matcher.group(i));
+      }
+      execute(event, discordListener, params);
+    }
+  }
+
+  public String getCommandPatternText() {
+    return COMMAND_PREFIX + commandPatternText;
+  }
+
+  public boolean isSecret() {
+    return isSecret;
+  }
+
+  public abstract String getDescription();
+
+  protected abstract void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params);
 }

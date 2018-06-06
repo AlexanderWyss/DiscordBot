@@ -1,26 +1,21 @@
 package wyss.website.discordbot.commands;
 
+import java.util.List;
+
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.RequestBuffer;
 import wyss.website.discordbot.DiscordListener;
 
-public class HelloCommand implements Command {
+public class HelloCommand extends Command {
+  private static final String COMMAND_PATTERN = "Hello";
 
-  private static final String COMMAND_TEXT = "Hello Bot";
-
-  @Override
-  public boolean matches(MessageReceivedEvent event, DiscordListener discordListener) {
-    return event.getMessage().getFormattedContent().equalsIgnoreCase(COMMAND_TEXT);
+  public HelloCommand() {
+    super(COMMAND_PATTERN);
   }
 
   @Override
-  public void execute(MessageReceivedEvent event, DiscordListener discordListener) {
+  protected void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
     RequestBuffer.request(() -> event.getChannel().sendMessage("Hello " + event.getAuthor().getName()));
-  }
-
-  @Override
-  public String getCommandPatternDescription() {
-    return COMMAND_TEXT;
   }
 
   @Override

@@ -1,38 +1,33 @@
 package wyss.website.discordbot.commands;
 
+import java.util.List;
+
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import wyss.website.discordbot.DiscordListener;
 import wyss.website.discordbot.TrackScheduler;
 
-public class LeaveCommand implements Command {
+public class LeaveCommand extends Command {
+  private static final String COMMAND_PATTERN = "Leave";
 
-	private static final String COMMAND_TEXT = "Leave me Bot";
+  public LeaveCommand() {
+    super(COMMAND_PATTERN);
+  }
 
-	@Override
-	public boolean matches(MessageReceivedEvent event, DiscordListener discordListener) {
-		return event.getMessage().getFormattedContent().equalsIgnoreCase(COMMAND_TEXT);
-	}
+  @Override
+  public void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
+    IVoiceChannel channel = event.getClient().getOurUser().getVoiceStateForGuild(event.getGuild()).getChannel();
+    if (channel != null) {
+      channel.leave();
+      TrackScheduler scheduler = discordListener.getGuildAudioPlayer(event.getGuild()).scheduler;
+      scheduler.pausePlaying();
+      scheduler.clear();
+    }
+  }
 
-	@Override
-	public void execute(MessageReceivedEvent event, DiscordListener discordListener) {
-		IVoiceChannel channel = event.getClient().getOurUser().getVoiceStateForGuild(event.getGuild()).getChannel();
-		if (channel != null) {
-			channel.leave();
-			TrackScheduler scheduler = discordListener.getGuildAudioPlayer(event.getGuild()).scheduler;
-			scheduler.pausePlaying();
-			scheduler.clear();
-		}
-	}
-
-	@Override
-	public String getCommandPatternDescription() {
-		return COMMAND_TEXT;
-	}
-
-	@Override
-	public String getDescription() {
-		return "Leaves the Channel";
-	}
+  @Override
+  public String getDescription() {
+    return "Leaves the Channel";
+  }
 
 }

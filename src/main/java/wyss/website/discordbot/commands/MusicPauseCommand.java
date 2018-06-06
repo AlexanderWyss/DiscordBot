@@ -1,30 +1,26 @@
 package wyss.website.discordbot.commands;
 
+import java.util.List;
+
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import wyss.website.discordbot.DiscordListener;
 
-public class MusicPauseCommand implements Command {
+public class MusicPauseCommand extends Command {
 
-	private static final String COMMAND_TEXT = "MusicBot pause";
+  private static final String COMMAND_PATTERN = "pause";
 
-	@Override
-	public boolean matches(MessageReceivedEvent event, DiscordListener discordListener) {
-		return event.getMessage().getFormattedContent().equalsIgnoreCase(COMMAND_TEXT);
-	}
+  public MusicPauseCommand() {
+    super(COMMAND_PATTERN);
+  }
 
-	@Override
-	public void execute(MessageReceivedEvent event, DiscordListener discordListener) {
-		discordListener.getGuildAudioPlayer(event.getGuild()).scheduler.pausePlaying();
-	}
+  @Override
+  public void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
+    discordListener.getGuildAudioPlayer(event.getGuild()).scheduler.pausePlaying();
+  }
 
-	@Override
-	public String getCommandPatternDescription() {
-		return COMMAND_TEXT;
-	}
-
-	@Override
-	public String getDescription() {
-		return "Pauses the music playback";
-	}
+  @Override
+  public String getDescription() {
+    return "Pauses the music playback";
+  }
 
 }
