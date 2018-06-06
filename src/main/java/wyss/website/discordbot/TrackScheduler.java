@@ -38,12 +38,12 @@ public class TrackScheduler extends AudioEventAdapter {
     updateAll();
   }
 
-  public void next(AudioTrack track) {
+  public void queueNext(AudioTrack track) {
     queue.add(nextIndex, track);
     updateAll();
   }
 
-  public void next(AudioPlaylist playlist) {
+  public void queueNext(AudioPlaylist playlist) {
     List<AudioTrack> tracks = playlist.getTracks();
     for (int i = 0; i < tracks.size(); i++) {
       queue.add(nextIndex + i, tracks.get(i));
