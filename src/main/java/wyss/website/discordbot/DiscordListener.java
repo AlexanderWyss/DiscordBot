@@ -102,19 +102,20 @@ public class DiscordListener {
   public void onMessageReceived(MessageReceivedEvent event) {
     if (event.getMessage().getContent().startsWith(Command.COMMAND_PREFIX)) {
       try {
+        RequestBuffer.request(() -> event.getMessage().delete()).get();
         boolean commandRecognized = false;
         for (Command command : commands) {
           boolean matches = command.executeIfmatches(event, this);
           commandRecognized = matches || commandRecognized;
         }
         if (!commandRecognized) {
-          RequestBuffer.request(() -> event.getChannel()
-              .sendMessage("Command not recognized. Type \"" + helpCommand.getCommandPatternText() + "\" for help."));
-        } else {
-          RequestBuffer.request(() -> event.getMessage().delete());
+          RequestBuffer.request(() -> event.getChannel().sendMessage("Command '" + event.getMessage().getContent()
+              + "' not recognized. Type \"" + helpCommand.getCommandPatternText() + "\" for help."));
         }
       } catch (Exception e) {
+        LOGGER.error("Stacktrace: ", e);
         RequestBuffer.request(() -> event.getChannel().sendMessage("An error occured while processing the command"));
+        throw e;
       }
     }
   }

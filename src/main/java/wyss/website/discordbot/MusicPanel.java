@@ -37,8 +37,7 @@ public class MusicPanel implements Observer {
   }
 
   public void show() {
-    sentMessage = RequestBuffer.request(() -> channel.sendMessage(getMessage())).get();
-    registerListeners();
+    sentMessage = RequestBuffer.request(() -> channel.sendMessage("Initializing...")).get();
 
     RequestBuffer.request(() -> sentMessage.addReaction(ARROW_BACK)).get();
     RequestBuffer.request(() -> sentMessage.addReaction(PAUSE_PLAY)).get();
@@ -48,6 +47,9 @@ public class MusicPanel implements Observer {
     RequestBuffer.request(() -> sentMessage.addReaction(REPEATE_EMOJI)).get();
     RequestBuffer.request(() -> sentMessage.addReaction(REPEATE_ONE_EMOJI)).get();
     RequestBuffer.request(() -> sentMessage.addReaction(DURATION)).get();
+
+    registerListeners();
+    update();
   }
 
   private void registerListeners() {
