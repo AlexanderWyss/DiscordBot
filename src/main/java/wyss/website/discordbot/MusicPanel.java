@@ -67,7 +67,7 @@ public class MusicPanel implements Observer {
 
   @Override
   public void update() {
-    RequestBuffer.request(() -> sentMessage = sentMessage.edit(getMessage()));
+    RequestBuffer.request(() -> sentMessage = sentMessage.edit(getMessage())).get();
   }
 
   private EmbedObject getMessage() {

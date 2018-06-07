@@ -15,7 +15,9 @@ public class MusicContinueCommand extends Command {
 
   @Override
   public void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
-    discordListener.getGuildAudioPlayer(event.getGuild()).scheduler.continuePlaying();
+    if (discordListener.isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+      discordListener.getGuildAudioPlayer(event.getGuild()).scheduler.continuePlaying();
+    }
   }
 
   @Override

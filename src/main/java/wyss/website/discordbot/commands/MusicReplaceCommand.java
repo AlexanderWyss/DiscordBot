@@ -41,7 +41,9 @@ public class MusicReplaceCommand extends Command {
             musicManager.scheduler.nextTrack();
           }
         });
-
+    if (!discordListener.isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+      musicManager.scheduler.pausePlaying();
+    }
   }
 
   @Override

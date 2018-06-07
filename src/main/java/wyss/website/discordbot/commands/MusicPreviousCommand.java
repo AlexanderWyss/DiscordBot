@@ -4,6 +4,7 @@ import java.util.List;
 
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import wyss.website.discordbot.DiscordListener;
+import wyss.website.discordbot.GuildMusicManager;
 
 public class MusicPreviousCommand extends Command {
 
@@ -15,7 +16,11 @@ public class MusicPreviousCommand extends Command {
 
   @Override
   public void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
-    discordListener.getGuildAudioPlayer(event.getGuild()).scheduler.previousTrack();
+    GuildMusicManager musicManager = discordListener.getGuildAudioPlayer(event.getGuild());
+    musicManager.scheduler.previousTrack();
+    if (!discordListener.isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+      musicManager.scheduler.pausePlaying();
+    }
   }
 
   @Override

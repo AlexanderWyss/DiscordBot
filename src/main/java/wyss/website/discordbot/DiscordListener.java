@@ -17,10 +17,14 @@ import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.reaction.ReactionEvent;
+import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelJoinEvent;
+import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelLeaveEvent;
+import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelMoveEvent;
 import sx.blah.discord.handle.impl.obj.ReactionEmoji;
 import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.RequestBuffer;
 import wyss.website.discordbot.commands.AnnounceCommand;
@@ -130,11 +134,17 @@ public class DiscordListener {
       ReactionEmoji emoji = event.getReaction().getEmoji();
       LOGGER.debug("Reaction recived from {} ({})", user.getName(), user.getStringID());
       if (MusicPanel.ARROW_BACK.equals(emoji)) {
-        scheduler.previousTrack();
+        if (isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+          scheduler.previousTrack();
+        }
       } else if (MusicPanel.PAUSE_PLAY.equals(emoji)) {
-        scheduler.togglePause();
+        if (isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+          scheduler.togglePause();
+        }
       } else if (MusicPanel.ARROW_FORWARD.equals(emoji)) {
-        scheduler.nextTrack();
+        if (isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+          scheduler.nextTrack();
+        }
       } else if (MusicPanel.VOLUME_DOWN.equals(emoji)) {
         guildAudioPlayer.volumeDown();
       } else if (MusicPanel.VOLUME_UP.equals(emoji)) {
@@ -147,6 +157,41 @@ public class DiscordListener {
         new DurationPanel(scheduler.getCurrentTrack()).send(event.getChannel());
       }
     }
+  }
+
+  @EventSubscriber
+  public void onVoiceChannelJoin(UserVoiceChannelJoinEvent event) {
+    pauseIfVoiceChannelEmpty(event.getGuild());
+  }
+
+  @EventSubscriber
+  public void onVoiceChannelLeave(UserVoiceChannelLeaveEvent event) {
+    pauseIfVoiceChannelEmpty(event.getGuild());
+  }
+
+  @EventSubscriber
+  public void onVoiceChannelMove(UserVoiceChannelMoveEvent event) {
+    pauseIfVoiceChannelEmpty(event.getGuild());
+  }
+
+  private void pauseIfVoiceChannelEmpty(IGuild guild) {
+    if (isCurrentVoiceChannelNotEmpty(guild)) {
+      getGuildAudioPlayer(guild).scheduler.continuePlaying();
+    } else {
+      getGuildAudioPlayer(guild).scheduler.pausePlaying();
+    }
+  }
+
+  public boolean isCurrentVoiceChannelNotEmpty(IGuild guild) {
+    IVoiceChannel currentChannel = client.getOurUser().getVoiceStateForGuild(guild).getChannel();
+    if (currentChannel != null) {
+      if (currentChannel.getConnectedUsers().size() == 1) {
+        return false;
+      } else if (currentChannel.getConnectedUsers().size() > 1) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public List<Command> getCommands() {
