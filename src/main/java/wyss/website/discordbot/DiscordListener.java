@@ -134,16 +134,18 @@ public class DiscordListener {
       ReactionEmoji emoji = event.getReaction().getEmoji();
       LOGGER.debug("Reaction recived from {} ({})", user.getName(), user.getStringID());
       if (MusicPanel.ARROW_BACK.equals(emoji)) {
-        if (isCurrentVoiceChannelNotEmpty(event.getGuild())) {
-          scheduler.previousTrack();
+        scheduler.previousTrack();
+        if (!isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+          scheduler.pausePlaying();
         }
       } else if (MusicPanel.PAUSE_PLAY.equals(emoji)) {
         if (isCurrentVoiceChannelNotEmpty(event.getGuild())) {
           scheduler.togglePause();
         }
       } else if (MusicPanel.ARROW_FORWARD.equals(emoji)) {
-        if (isCurrentVoiceChannelNotEmpty(event.getGuild())) {
-          scheduler.nextTrack();
+        scheduler.nextTrack();
+        if (!isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+          scheduler.pausePlaying();
         }
       } else if (MusicPanel.VOLUME_DOWN.equals(emoji)) {
         guildAudioPlayer.volumeDown();
