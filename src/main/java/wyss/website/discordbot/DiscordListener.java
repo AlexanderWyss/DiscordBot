@@ -52,7 +52,7 @@ public class DiscordListener {
   private Map<Long, GuildMusicManager> musicManagers;
 
   private List<Command> commands;
-  private HelpCommand helpCommand = new HelpCommand();;
+  private HelpCommand helpCommand = new HelpCommand();
   private MusicPanelCommand musicPanelCommand = new MusicPanelCommand();
 
   private IDiscordClient client;
