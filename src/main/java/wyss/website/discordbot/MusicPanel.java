@@ -14,6 +14,7 @@ import sx.blah.discord.util.RequestBuffer;
 
 public class MusicPanel implements Observer {
 
+  private static final String TITLE = "Music Panel";
   private static final String REPEATE = "\uD83D\uDD01";
   private static final String REPEATE_ONE = "\uD83D\uDD02";
   private static final String PLAING = "\u25B6";
@@ -37,7 +38,9 @@ public class MusicPanel implements Observer {
   }
 
   public void show() {
-    sentMessage = RequestBuffer.request(() -> channel.sendMessage("Initializing...")).get();
+    sentMessage = RequestBuffer
+        .request(() -> channel.sendMessage(new EmbedBuilder().withTitle(TITLE).appendDesc("Initializing...").build()))
+        .get();
 
     RequestBuffer.request(() -> sentMessage.addReaction(ARROW_BACK)).get();
     RequestBuffer.request(() -> sentMessage.addReaction(PAUSE_PLAY)).get();
@@ -71,7 +74,7 @@ public class MusicPanel implements Observer {
     GuildMusicManager guildAudioPlayer = discordListener.getGuildAudioPlayer(channel.getGuild());
     TrackScheduler scheduler = guildAudioPlayer.scheduler;
     AudioTrack currentTrack = scheduler.getCurrentTrack();
-    EmbedBuilder embedObject = new EmbedBuilder().withTitle("Music Panel");
+    EmbedBuilder embedObject = new EmbedBuilder().withTitle(TITLE);
     if (currentTrack != null) {
       AudioTrackInfo info = currentTrack.getInfo();
       embedObject.appendField("Title", (scheduler.isPaused() ? PAUSED : PLAING) + " " + info.title, false);
