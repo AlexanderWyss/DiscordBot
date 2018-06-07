@@ -19,6 +19,30 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>
+										wyss.website.discordbot.App
+									</mainClass>
+								</manifest>
+							</archive> 
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<properties>
@@ -26,7 +50,7 @@
 	</properties>
 	<repositories>
 		<repository>
-			<id>central</id>
+			<id>jcenter</id>
 			<name>bintray</name>
 			<url>http://jcenter.bintray.com</url>
 		</repository>
