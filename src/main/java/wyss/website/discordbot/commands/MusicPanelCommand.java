@@ -1,15 +1,17 @@
 package wyss.website.discordbot.commands;
 
 import java.util.List;
+import java.util.Map;
 
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.obj.IChannel;
 import wyss.website.discordbot.DiscordListener;
 import wyss.website.discordbot.MusicPanel;
 
 public class MusicPanelCommand extends Command {
 
   private static final String COMMAND_PATTERN = "musicpanel";
-  private MusicPanel oldPanel = null;
+  private Map<IChannel, MusicPanel> oldPanels = null;
 
   public MusicPanelCommand() {
     super(COMMAND_PATTERN);
@@ -17,11 +19,12 @@ public class MusicPanelCommand extends Command {
 
   @Override
   public void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
-    MusicPanel musicPanel = new MusicPanel(event.getChannel(), discordListener);
-    if (oldPanel != null) {
-      oldPanel.shutdown();
+    IChannel channel = event.getChannel();
+    MusicPanel musicPanel = new MusicPanel(channel, discordListener);
+    if (oldPanels.containsKey(channel)) {
+      oldPanels.get(channel).shutdown();
     }
-    oldPanel = musicPanel;
+    oldPanels.put(channel, musicPanel);
     musicPanel.show();
   }
 
