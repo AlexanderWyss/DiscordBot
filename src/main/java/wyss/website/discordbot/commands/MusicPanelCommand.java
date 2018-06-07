@@ -33,4 +33,8 @@ public class MusicPanelCommand extends Command {
     return "Shows a Music-Controll-Panel";
   }
 
+  public void deleteAll() {
+    oldPanels.values().forEach(MusicPanel::shutdown);
+  }
+
 }

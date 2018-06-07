@@ -12,6 +12,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
+import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -52,9 +53,13 @@ public class DiscordListener {
 
   private List<Command> commands;
   private HelpCommand helpCommand = new HelpCommand();;
+  private MusicPanelCommand musicPanelCommand = new MusicPanelCommand();
+
+  private IDiscordClient client;
 
   @EventSubscriber
   public void onReady(ReadyEvent event) {
+    client = event.getClient();
     musicManagers = new HashMap<>();
 
     playerManager = new DefaultAudioPlayerManager();
@@ -78,7 +83,7 @@ public class DiscordListener {
     commands.add(new MusicSetVolumeCommand());
     commands.add(new MusicRepeateCommand());
     commands.add(new MusicRepeateSongCommand());
-    commands.add(new MusicPanelCommand());
+    commands.add(musicPanelCommand);
     commands.add(new MusicDurationCommand());
     commands.add(new AnnounceCommand());
     commands.add(new ShutdownCommand());
@@ -155,5 +160,10 @@ public class DiscordListener {
     List<String> admins = new ArrayList<>();
     admins.add("289059059829833728");
     return admins;
+  }
+
+  public void shutdown() {
+    musicPanelCommand.deleteAll();
+    client.logout();
   }
 }
