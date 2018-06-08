@@ -39,6 +39,7 @@ public class MusicPlayCommand extends Command {
             musicManager.scheduler.nextTrack();
           }
         });
+    new JoinCommand().execute(event, discordListener, params);
     if (!discordListener.isCurrentVoiceChannelNotEmpty(event.getGuild())) {
       musicManager.scheduler.pausePlaying();
     }
