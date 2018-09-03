@@ -29,6 +29,7 @@ import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.RequestBuffer;
 import wyss.website.discordbot.commands.AnnounceCommand;
 import wyss.website.discordbot.commands.Command;
+import wyss.website.discordbot.commands.FlipACoinCommand;
 import wyss.website.discordbot.commands.HelloCommand;
 import wyss.website.discordbot.commands.HelpCommand;
 import wyss.website.discordbot.commands.JoinCommand;
@@ -90,6 +91,7 @@ public class DiscordListener {
     commands.add(musicPanelCommand);
     commands.add(new MusicDurationCommand());
     commands.add(new AnnounceCommand());
+    commands.add(new FlipACoinCommand());
     commands.add(new ShutdownCommand());
 
     event.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING, helpCommand.getCommandPatternText());
