@@ -25,10 +25,10 @@ public class HelpCommand extends Command {
             .append(System.lineSeparator());
       }
     }
-    builder.append(System.lineSeparator()).append("All commands are case insensitiv");
+    builder.append(System.lineSeparator()).append("All commands are case insensitive");
     builder.append(System.lineSeparator()).append(System.lineSeparator());
     builder.append("The bot is a bit shy and doesn't answer to all commands.").append(System.lineSeparator());
-    builder.append("If his quiet he probably understood your command.");
+    builder.append("If he's quiet, he probably understood your command.");
     RequestBuffer.request(() -> event.getChannel()
         .sendMessage(new EmbedBuilder().withTitle("Command - Description").appendDesc(builder.toString()).build()));
   }

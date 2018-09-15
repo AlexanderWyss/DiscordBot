@@ -9,7 +9,7 @@ import wyss.website.discordbot.DiscordListener;
 public class AnnounceCommand extends Command {
 
   private static final String COMMAND_PATTERN = "announce (.+)";
-  private static final String COMMAND_PATTERN_DESCRIPTION = "Announce <text>";
+  private static final String COMMAND_PATTERN_DESCRIPTION = "announce <text>";
 
   public AnnounceCommand() {
     super(COMMAND_PATTERN, COMMAND_PATTERN_DESCRIPTION);

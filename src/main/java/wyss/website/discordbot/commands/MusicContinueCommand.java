@@ -7,7 +7,7 @@ import wyss.website.discordbot.DiscordListener;
 
 public class MusicContinueCommand extends Command {
 
-  private static final String COMMAND_PATTERN = "continue";
+  private static final String COMMAND_PATTERN = "resume";
 
   public MusicContinueCommand() {
     super(COMMAND_PATTERN);
@@ -22,7 +22,7 @@ public class MusicContinueCommand extends Command {
 
   @Override
   public String getDescription() {
-    return "Continues the music playback";
+    return "Resumes the music playback";
   }
 
 }

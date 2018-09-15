@@ -29,7 +29,7 @@ public class MusicRepeateCommand extends Command {
 
   @Override
   public String getDescription() {
-    return "Repeate the current playlist infinitly";
+    return "Repeat the current playlist infinitely";
   }
 
 }

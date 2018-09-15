@@ -31,7 +31,7 @@ public class MusicPanelCommand extends Command {
 
   @Override
   public String getDescription() {
-    return "Shows a Music-Controll-Panel";
+    return "Shows a Music-Control-Panel";
   }
 
   public void deleteAll() {
