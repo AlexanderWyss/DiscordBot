@@ -5,3 +5,7 @@ Used Librarys:
   
 I have no absolutely no understanding about licenses  
 pls don't sue
+
+Ideas:
+Rock Paper Scissors
+Join Sounds
