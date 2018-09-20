@@ -11,6 +11,7 @@ public class ShutdownCommand extends Command {
 
   public ShutdownCommand() {
     super(COMMAND_TEXT, true);
+    setAdminOnly(true);
   }
 
   @Override

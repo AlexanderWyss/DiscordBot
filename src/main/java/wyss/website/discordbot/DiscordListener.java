@@ -44,11 +44,12 @@ import wyss.website.discordbot.commands.MusicPlayCommand;
 import wyss.website.discordbot.commands.MusicPlayNextCommand;
 import wyss.website.discordbot.commands.MusicPreviousCommand;
 import wyss.website.discordbot.commands.MusicQueueCommand;
-import wyss.website.discordbot.commands.MusicRepeateCommand;
-import wyss.website.discordbot.commands.MusicRepeateSongCommand;
+import wyss.website.discordbot.commands.MusicRepeatCommand;
+import wyss.website.discordbot.commands.MusicRepeatSongCommand;
 import wyss.website.discordbot.commands.MusicReplaceCommand;
 import wyss.website.discordbot.commands.MusicSetVolumeCommand;
 import wyss.website.discordbot.commands.ShutdownCommand;
+import wyss.website.discordbot.commands.ShutupCommand;
 
 public class DiscordListener {
   private static final Logger LOGGER = LoggerFactory.getLogger(DiscordListener.class);
@@ -86,12 +87,13 @@ public class DiscordListener {
     commands.add(new MusicContinueCommand());
     commands.add(new MusicClearCommand());
     commands.add(new MusicSetVolumeCommand());
-    commands.add(new MusicRepeateCommand());
-    commands.add(new MusicRepeateSongCommand());
+    commands.add(new MusicRepeatCommand());
+    commands.add(new MusicRepeatSongCommand());
     commands.add(musicPanelCommand);
     commands.add(new MusicDurationCommand());
     commands.add(new AnnounceCommand());
     commands.add(new FlipACoinCommand());
+    commands.add(new ShutupCommand());
     commands.add(new ShutdownCommand());
 
     event.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING, helpCommand.getCommandPatternText());

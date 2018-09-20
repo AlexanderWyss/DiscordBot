@@ -21,6 +21,7 @@ public abstract class Command {
   private String regexPattern;
   private String commandPatternText;
   private boolean isSecret;
+  private boolean adminOnly = false;
 
   public Command(String regexPattern, String commandPatternText, boolean isSecret) {
     this.regexPattern = regexPattern;
@@ -41,7 +42,7 @@ public abstract class Command {
   }
 
   public boolean executeIfmatches(MessageReceivedEvent event, DiscordListener discordListener) {
-    if (!isSecret || discordListener.getAdmins().contains(event.getAuthor().getStringID())) {
+    if (!adminOnly || discordListener.getAdmins().contains(event.getAuthor().getStringID())) {
       Pattern pattern = Pattern.compile(ESCAPED_COMMAND_PREFIX + regexPattern,
           Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
       Matcher matcher = pattern.matcher(event.getMessage().getContent().trim());
@@ -65,6 +66,14 @@ public abstract class Command {
 
   public boolean isSecret() {
     return isSecret;
+  }
+
+  public boolean isAdminOnly() {
+    return adminOnly;
+  }
+
+  public void setAdminOnly(boolean adminOnly) {
+    this.adminOnly = adminOnly;
   }
 
   public abstract String getDescription();

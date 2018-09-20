@@ -8,12 +8,12 @@ import sx.blah.discord.util.RequestBuffer;
 import wyss.website.discordbot.DiscordListener;
 import wyss.website.discordbot.GuildMusicManager;
 
-public class MusicRepeateCommand extends Command {
+public class MusicRepeatSongCommand extends Command {
 
-  private static final String COMMAND_PATTERN = "repeate (.)";
-  private static final String COMMAND_PATTERN_DESCRIPTION = "repeate <y/n>";
+  private static final String COMMAND_PATTERN = "repeatSong (.)";
+  private static final String COMMAND_PATTERN_DESCRIPTION = "repeatSong <y/n>";
 
-  public MusicRepeateCommand() {
+  public MusicRepeatSongCommand() {
     super(COMMAND_PATTERN, COMMAND_PATTERN_DESCRIPTION);
   }
 
@@ -23,13 +23,13 @@ public class MusicRepeateCommand extends Command {
     IChannel channel = event.getChannel();
     GuildMusicManager musicManager = discordListener.getGuildAudioPlayer(channel.getGuild());
     boolean value = "y".equals(param);
-    musicManager.scheduler.setRepeatePlaylist(value);
-    RequestBuffer.request(() -> channel.sendMessage("Playlist repeate set to " + value));
+    musicManager.scheduler.setRepeateSong(value);
+    RequestBuffer.request(() -> channel.sendMessage("Song repeate set to " + value));
   }
 
   @Override
   public String getDescription() {
-    return "Repeat the current playlist infinitely";
+    return "Repeat the current song infinitely";
   }
 
 }
