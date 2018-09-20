@@ -6,30 +6,26 @@ import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedE
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.RequestBuffer;
 import wyss.website.discordbot.DiscordListener;
-import wyss.website.discordbot.GuildMusicManager;
+import wyss.website.discordbot.TrackScheduler;
 
 public class MusicRepeatCommand extends Command {
 
-  private static final String COMMAND_PATTERN = "repeat (.)";
-  private static final String COMMAND_PATTERN_DESCRIPTION = "repeat <y/n>";
+  private static final String COMMAND_PATTERN = "repeatPlaylist";
 
   public MusicRepeatCommand() {
-    super(COMMAND_PATTERN, COMMAND_PATTERN_DESCRIPTION);
+    super(COMMAND_PATTERN);
   }
 
   @Override
   public void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
-    String param = params.get(0);
     IChannel channel = event.getChannel();
-    GuildMusicManager musicManager = discordListener.getGuildAudioPlayer(channel.getGuild());
-    boolean value = "y".equals(param);
-    musicManager.scheduler.setRepeatePlaylist(value);
-    RequestBuffer.request(() -> channel.sendMessage("Playlist repeate set to " + value));
+    TrackScheduler scheduler = discordListener.getGuildAudioPlayer(channel.getGuild()).scheduler;
+    scheduler.toggleRepeatePlaylist();
+    RequestBuffer.request(() -> channel.sendMessage("Playlist repeat set to " + scheduler.isRepeatePlaylistSet()));
   }
 
   @Override
   public String getDescription() {
-    return "Repeat the current playlist infinitely";
+    return "Repeat the current playlist infinitely (toggle)";
   }
-
 }
