@@ -12,7 +12,7 @@ public class DeadminCommand extends Command {
   private static final String COMMAND_PATTERN_DESCRIPTION = "deadmin <user>";
 
   public DeadminCommand() {
-    super(COMMAND_PATTERN, COMMAND_PATTERN_DESCRIPTION);
+    super(COMMAND_PATTERN, COMMAND_PATTERN_DESCRIPTION, true);
     setAdminOnly(true);
   }
 

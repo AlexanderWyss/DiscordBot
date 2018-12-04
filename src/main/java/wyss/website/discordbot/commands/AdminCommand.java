@@ -12,7 +12,7 @@ public class AdminCommand extends Command {
   private static final String COMMAND_PATTERN_DESCRIPTION = "admin <user>";
 
   public AdminCommand() {
-    super(COMMAND_PATTERN, COMMAND_PATTERN_DESCRIPTION);
+    super(COMMAND_PATTERN, COMMAND_PATTERN_DESCRIPTION, true);
     setAdminOnly(true);
   }
 
