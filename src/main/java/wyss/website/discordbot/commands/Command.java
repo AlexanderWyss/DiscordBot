@@ -42,7 +42,7 @@ public abstract class Command {
   }
 
   public boolean executeIfmatches(MessageReceivedEvent event, DiscordListener discordListener) {
-    if (!adminOnly || discordListener.getAdmins().contains(event.getAuthor().getStringID())) {
+    if (!adminOnly || discordListener.isAdmin(event.getAuthor())) {
       Pattern pattern = Pattern.compile(ESCAPED_COMMAND_PREFIX + regexPattern,
           Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
       Matcher matcher = pattern.matcher(event.getMessage().getContent().trim());

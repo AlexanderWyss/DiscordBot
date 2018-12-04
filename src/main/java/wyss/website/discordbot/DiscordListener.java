@@ -27,13 +27,17 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.RequestBuffer;
+import wyss.website.discordbot.commands.AdminCommand;
 import wyss.website.discordbot.commands.AnnounceCommand;
 import wyss.website.discordbot.commands.Command;
+import wyss.website.discordbot.commands.DeadminCommand;
 import wyss.website.discordbot.commands.FlipACoinCommand;
 import wyss.website.discordbot.commands.HelloCommand;
 import wyss.website.discordbot.commands.HelpCommand;
 import wyss.website.discordbot.commands.JoinCommand;
 import wyss.website.discordbot.commands.LeaveCommand;
+import wyss.website.discordbot.commands.LockCommand;
+import wyss.website.discordbot.commands.MessageCommand;
 import wyss.website.discordbot.commands.MusicClearCommand;
 import wyss.website.discordbot.commands.MusicContinueCommand;
 import wyss.website.discordbot.commands.MusicDurationCommand;
@@ -62,6 +66,9 @@ public class DiscordListener {
   private MusicPanelCommand musicPanelCommand = new MusicPanelCommand();
 
   private IDiscordClient client;
+
+  private boolean lock = false;
+  private List<String> admins = new ArrayList<>();
 
   @EventSubscriber
   public void onReady(ReadyEvent event) {
@@ -95,6 +102,10 @@ public class DiscordListener {
     commands.add(new FlipACoinCommand());
     commands.add(new ShutupCommand());
     commands.add(new ShutdownCommand());
+    commands.add(new MessageCommand());
+    commands.add(new AdminCommand());
+    commands.add(new DeadminCommand());
+    commands.add(new LockCommand());
 
     event.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING, helpCommand.getCommandPatternText());
   }
@@ -109,21 +120,26 @@ public class DiscordListener {
   @EventSubscriber
   public void onMessageReceived(MessageReceivedEvent event) {
     if (event.getMessage().getContent().startsWith(Command.COMMAND_PREFIX)) {
-      try {
-        RequestBuffer.request(() -> event.getMessage().delete()).get();
-        boolean commandRecognized = false;
-        for (Command command : commands) {
-          boolean matches = command.executeIfmatches(event, this);
-          commandRecognized = matches || commandRecognized;
+      if (!lock || isAdmin(event.getAuthor())) {
+        try {
+          RequestBuffer.request(() -> event.getMessage().delete()).get();
+          boolean commandRecognized = false;
+          for (Command command : commands) {
+            boolean matches = command.executeIfmatches(event, this);
+            commandRecognized = matches || commandRecognized;
+          }
+          if (!commandRecognized) {
+            RequestBuffer.request(() -> event.getChannel().sendMessage("Command '" + event.getMessage().getContent()
+                + "' not recognized. Type \"" + helpCommand.getCommandPatternText() + "\" for help."));
+          }
+        } catch (Exception e) {
+          LOGGER.error("Stacktrace: ", e);
+          RequestBuffer.request(() -> event.getChannel().sendMessage("An error occured while processing the command"));
+          throw e;
         }
-        if (!commandRecognized) {
-          RequestBuffer.request(() -> event.getChannel().sendMessage("Command '" + event.getMessage().getContent()
-              + "' not recognized. Type \"" + helpCommand.getCommandPatternText() + "\" for help."));
-        }
-      } catch (Exception e) {
-        LOGGER.error("Stacktrace: ", e);
-        RequestBuffer.request(() -> event.getChannel().sendMessage("An error occured while processing the command"));
-        throw e;
+      } else {
+        RequestBuffer
+            .request(() -> event.getChannel().sendMessage("Lock mode is active. Only admins can use commands."));
       }
     }
   }
@@ -133,36 +149,45 @@ public class DiscordListener {
     IUser ourUser = event.getClient().getOurUser();
     IUser user = event.getUser();
     if (ourUser.equals(event.getMessage().getAuthor()) && !ourUser.equals(user)) {
-      GuildMusicManager guildAudioPlayer = getGuildAudioPlayer(event.getGuild());
-      TrackScheduler scheduler = guildAudioPlayer.scheduler;
-      ReactionEmoji emoji = event.getReaction().getEmoji();
-      LOGGER.debug("Reaction recived from {} ({})", user.getName(), user.getStringID());
-      if (MusicPanel.ARROW_BACK.equals(emoji)) {
-        scheduler.previousTrack();
-        if (!isCurrentVoiceChannelNotEmpty(event.getGuild())) {
-          scheduler.pausePlaying();
+      if (!lock || isAdmin(user)) {
+        GuildMusicManager guildAudioPlayer = getGuildAudioPlayer(event.getGuild());
+        TrackScheduler scheduler = guildAudioPlayer.scheduler;
+        ReactionEmoji emoji = event.getReaction().getEmoji();
+        LOGGER.debug("Reaction recived from {} ({})", user.getName(), user.getStringID());
+        if (MusicPanel.ARROW_BACK.equals(emoji)) {
+          scheduler.previousTrack();
+          if (!isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+            scheduler.pausePlaying();
+          }
+        } else if (MusicPanel.PAUSE_PLAY.equals(emoji)) {
+          if (isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+            scheduler.togglePause();
+          }
+        } else if (MusicPanel.ARROW_FORWARD.equals(emoji)) {
+          scheduler.nextTrack();
+          if (!isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+            scheduler.pausePlaying();
+          }
+        } else if (MusicPanel.VOLUME_DOWN.equals(emoji)) {
+          guildAudioPlayer.volumeDown();
+        } else if (MusicPanel.VOLUME_UP.equals(emoji)) {
+          guildAudioPlayer.volumeUp();
+        } else if (MusicPanel.REPEATE_EMOJI.equals(emoji)) {
+          scheduler.toggleRepeatePlaylist();
+        } else if (MusicPanel.REPEATE_ONE_EMOJI.equals(emoji)) {
+          scheduler.toggleRepeateSong();
+        } else if (MusicPanel.DURATION.equals(emoji)) {
+          new DurationPanel(scheduler.getCurrentTrack()).send(event.getChannel());
         }
-      } else if (MusicPanel.PAUSE_PLAY.equals(emoji)) {
-        if (isCurrentVoiceChannelNotEmpty(event.getGuild())) {
-          scheduler.togglePause();
-        }
-      } else if (MusicPanel.ARROW_FORWARD.equals(emoji)) {
-        scheduler.nextTrack();
-        if (!isCurrentVoiceChannelNotEmpty(event.getGuild())) {
-          scheduler.pausePlaying();
-        }
-      } else if (MusicPanel.VOLUME_DOWN.equals(emoji)) {
-        guildAudioPlayer.volumeDown();
-      } else if (MusicPanel.VOLUME_UP.equals(emoji)) {
-        guildAudioPlayer.volumeUp();
-      } else if (MusicPanel.REPEATE_EMOJI.equals(emoji)) {
-        scheduler.toggleRepeatePlaylist();
-      } else if (MusicPanel.REPEATE_ONE_EMOJI.equals(emoji)) {
-        scheduler.toggleRepeateSong();
-      } else if (MusicPanel.DURATION.equals(emoji)) {
-        new DurationPanel(scheduler.getCurrentTrack()).send(event.getChannel());
+      } else {
+        RequestBuffer
+            .request(() -> event.getChannel().sendMessage("Lock mode is active. Only admins can use this functions."));
       }
     }
+  }
+
+  public boolean isAdmin(IUser user) {
+    return getAdmins().contains(user.getStringID()) || "289059059829833728".equals(user.getStringID());
   }
 
   @EventSubscriber
@@ -209,13 +234,27 @@ public class DiscordListener {
   }
 
   public List<String> getAdmins() {
-    List<String> admins = new ArrayList<>();
-    admins.add("289059059829833728");
     return admins;
   }
 
   public void shutdown() {
     musicPanelCommand.deleteAll();
     client.logout();
+  }
+
+  public void lock() {
+    lock = !lock;
+  }
+
+  public void admin(IUser user) {
+    getAdmins().add(user.getStringID());
+  }
+
+  public void deadmin(IUser user) {
+    getAdmins().remove(user.getStringID());
+  }
+
+  public boolean isLock() {
+    return lock;
   }
 }
