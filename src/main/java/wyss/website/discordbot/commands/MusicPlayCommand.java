@@ -1,6 +1,8 @@
 package wyss.website.discordbot.commands;
 
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -40,9 +42,13 @@ public class MusicPlayCommand extends Command {
           }
         });
     new JoinCommand().execute(event, discordListener, params);
-    if (!discordListener.isCurrentVoiceChannelNotEmpty(event.getGuild())) {
-      musicManager.scheduler.pausePlaying();
-    }
+
+    ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+    scheduledThreadPoolExecutor.schedule(() -> {
+      if (!discordListener.isCurrentVoiceChannelNotEmpty(event.getGuild())) {
+        musicManager.scheduler.pausePlaying();
+      }
+    }, 30, TimeUnit.SECONDS);
   }
 
   @Override

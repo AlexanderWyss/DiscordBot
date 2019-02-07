@@ -27,6 +27,7 @@ public class MusicPanel implements Observer {
   public static final ReactionEmoji REPEATE_EMOJI = ReactionEmoji.of(REPEATE);
   public static final ReactionEmoji REPEATE_ONE_EMOJI = ReactionEmoji.of(REPEATE_ONE);
   public static final ReactionEmoji DURATION = ReactionEmoji.of("\u231A");
+  public static final ReactionEmoji REMOVE = ReactionEmoji.of("\u274C");
 
   private IChannel channel;
   private IMessage sentMessage;
@@ -50,6 +51,7 @@ public class MusicPanel implements Observer {
     RequestBuffer.request(() -> sentMessage.addReaction(REPEATE_EMOJI)).get();
     RequestBuffer.request(() -> sentMessage.addReaction(REPEATE_ONE_EMOJI)).get();
     RequestBuffer.request(() -> sentMessage.addReaction(DURATION)).get();
+    RequestBuffer.request(() -> sentMessage.addReaction(REMOVE)).get();
 
     registerListeners();
     update();

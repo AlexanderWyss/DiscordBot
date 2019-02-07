@@ -48,6 +48,7 @@ import wyss.website.discordbot.commands.MusicPlayCommand;
 import wyss.website.discordbot.commands.MusicPlayNextCommand;
 import wyss.website.discordbot.commands.MusicPreviousCommand;
 import wyss.website.discordbot.commands.MusicQueueCommand;
+import wyss.website.discordbot.commands.MusicRemoveCurrentSongCommand;
 import wyss.website.discordbot.commands.MusicRepeatCommand;
 import wyss.website.discordbot.commands.MusicRepeatSongCommand;
 import wyss.website.discordbot.commands.MusicReplaceCommand;
@@ -89,6 +90,7 @@ public class DiscordListener {
     commands.add(new MusicPlayNextCommand());
     commands.add(new MusicQueueCommand());
     commands.add(new MusicReplaceCommand());
+    commands.add(new MusicRemoveCurrentSongCommand());
     commands.add(new MusicNextCommand());
     commands.add(new MusicPreviousCommand());
     commands.add(new MusicPauseCommand());
@@ -180,6 +182,8 @@ public class DiscordListener {
           scheduler.toggleRepeateSong();
         } else if (MusicPanel.DURATION.equals(emoji)) {
           new DurationPanel(scheduler.getCurrentTrack()).send(event.getChannel());
+        } else if (MusicPanel.REMOVE.equals(emoji)) {
+          scheduler.removeCurrentSong();
         }
       } else {
         RequestBuffer
@@ -208,9 +212,7 @@ public class DiscordListener {
   }
 
   private void pauseIfVoiceChannelEmpty(IGuild guild) {
-    if (isCurrentVoiceChannelNotEmpty(guild)) {
-      getGuildAudioPlayer(guild).scheduler.continuePlaying();
-    } else {
+    if (!isCurrentVoiceChannelNotEmpty(guild)) {
       getGuildAudioPlayer(guild).scheduler.pausePlaying();
     }
   }

@@ -57,9 +57,11 @@ public class TrackScheduler extends AudioEventAdapter {
     updateAll();
   }
 
-  public void nextTrack() {
+  private void nextTrack(boolean keepInQueue) {
     if (currentTrack != null) {
-      previousQueue.addLast(currentTrack);
+      if (keepInQueue) {
+        previousQueue.addLast(currentTrack);
+      }
       currentTrack = null;
     }
     AudioTrack track;
@@ -72,8 +74,15 @@ public class TrackScheduler extends AudioEventAdapter {
         queue = previousQueue;
         previousQueue = queueTemp;
         nextTrack();
+      } else {
+        previousTrack();
+        setPaused(true);
       }
     }
+  }
+
+  public void nextTrack() {
+    nextTrack(true);
   }
 
   public void previousTrack() {
@@ -83,6 +92,12 @@ public class TrackScheduler extends AudioEventAdapter {
     }
     AudioTrack track;
     if ((track = previousQueue.pollLast()) != null) {
+      play(track);
+      currentTrack = track;
+    } else if (repeatePlaylist && (track = queue.pollLast()) != null) {
+      Deque<AudioTrack> queueTemp = queue;
+      queue = previousQueue;
+      previousQueue = queueTemp;
       play(track);
       currentTrack = track;
     } else {
@@ -209,5 +224,9 @@ public class TrackScheduler extends AudioEventAdapter {
 
   public void removeListener(Observer observer) {
     observers.remove(observer);
+  }
+
+  public void removeCurrentSong() {
+    nextTrack(false);
   }
 }

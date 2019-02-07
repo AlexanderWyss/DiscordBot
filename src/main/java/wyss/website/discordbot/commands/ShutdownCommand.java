@@ -17,6 +17,7 @@ public class ShutdownCommand extends Command {
   @Override
   public void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
     discordListener.shutdown();
+    System.exit(0);
   }
 
   @Override
