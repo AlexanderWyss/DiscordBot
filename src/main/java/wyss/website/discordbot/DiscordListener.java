@@ -1,5 +1,9 @@
 package wyss.website.discordbot;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +60,12 @@ import wyss.website.discordbot.commands.MusicSetVolumeCommand;
 import wyss.website.discordbot.commands.RebootCommand;
 import wyss.website.discordbot.commands.ShutdownCommand;
 import wyss.website.discordbot.commands.ShutupCommand;
+import wyss.website.discordbot.commands.playlist.PlaylistAddCommand;
+import wyss.website.discordbot.commands.playlist.PlaylistDeleteCommand;
+import wyss.website.discordbot.commands.playlist.PlaylistPersister;
+import wyss.website.discordbot.commands.playlist.PlaylistPlayCommand;
+import wyss.website.discordbot.commands.playlist.PlaylistRemoveCommand;
+import wyss.website.discordbot.commands.playlist.PlaylistsCommand;
 
 public class DiscordListener {
   private static final Logger LOGGER = LoggerFactory.getLogger(DiscordListener.class);
@@ -72,10 +82,19 @@ public class DiscordListener {
   private boolean lock = false;
   private List<String> admins = new ArrayList<>();
 
+  private PlaylistPersister playlistPersister;
+
   @EventSubscriber
   public void onReady(ReadyEvent event) {
     client = event.getClient();
     musicManagers = new HashMap<>();
+
+    try {
+      playlistPersister = new PlaylistPersister(getPath());
+      playlistPersister.loadPlaylists();
+    } catch (URISyntaxException | IOException e) {
+      e.printStackTrace();
+    }
 
     playerManager = new DefaultAudioPlayerManager();
     AudioSourceManagers.registerRemoteSources(playerManager);
@@ -101,6 +120,11 @@ public class DiscordListener {
     commands.add(new MusicRepeatSongCommand());
     commands.add(musicPanelCommand);
     commands.add(new MusicDurationCommand());
+    commands.add(new PlaylistPlayCommand());
+    commands.add(new PlaylistAddCommand());
+    commands.add(new PlaylistRemoveCommand());
+    commands.add(new PlaylistsCommand());
+    commands.add(new PlaylistDeleteCommand());
     commands.add(new AnnounceCommand());
     commands.add(new FlipACoinCommand());
     commands.add(new ShutupCommand());
@@ -260,5 +284,18 @@ public class DiscordListener {
 
   public boolean isLock() {
     return lock;
+  }
+
+  public PlaylistPersister getPlaylistPersister() {
+    return playlistPersister;
+  }
+
+  private Path getPath() throws URISyntaxException {
+    return getRootUrl();
+  }
+
+  private Path getRootUrl() throws URISyntaxException {
+    return Paths.get(PlaylistPersister.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent()
+        .resolve("discordbot");
   }
 }

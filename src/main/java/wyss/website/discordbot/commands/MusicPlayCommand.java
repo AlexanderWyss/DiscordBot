@@ -24,6 +24,10 @@ public class MusicPlayCommand extends Command {
   @Override
   public void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
     String url = params.get(0);
+    play(event, discordListener, url);
+  }
+
+  public void play(MessageReceivedEvent event, DiscordListener discordListener, String url) {
     IChannel channel = event.getChannel();
     GuildMusicManager musicManager = discordListener.getGuildAudioPlayer(channel.getGuild());
     discordListener.getPlayerManager().loadItemOrdered(musicManager, url,
@@ -41,7 +45,7 @@ public class MusicPlayCommand extends Command {
             musicManager.scheduler.nextTrack();
           }
         });
-    new JoinCommand().execute(event, discordListener, params);
+    new JoinCommand().execute(event, discordListener, null);
 
     ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
     scheduledThreadPoolExecutor.schedule(() -> {
