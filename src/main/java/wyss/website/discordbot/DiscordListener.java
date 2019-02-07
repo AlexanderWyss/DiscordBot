@@ -52,6 +52,7 @@ import wyss.website.discordbot.commands.MusicRepeatCommand;
 import wyss.website.discordbot.commands.MusicRepeatSongCommand;
 import wyss.website.discordbot.commands.MusicReplaceCommand;
 import wyss.website.discordbot.commands.MusicSetVolumeCommand;
+import wyss.website.discordbot.commands.RebootCommand;
 import wyss.website.discordbot.commands.ShutdownCommand;
 import wyss.website.discordbot.commands.ShutupCommand;
 
@@ -106,6 +107,7 @@ public class DiscordListener {
     commands.add(new AdminCommand());
     commands.add(new DeadminCommand());
     commands.add(new LockCommand());
+    commands.add(new RebootCommand());
 
     event.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING, helpCommand.getCommandPatternText());
   }

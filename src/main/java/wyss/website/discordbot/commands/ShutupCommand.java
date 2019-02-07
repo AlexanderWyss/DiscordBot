@@ -16,6 +16,7 @@ public class ShutupCommand extends Command {
   @Override
   protected void execute(MessageReceivedEvent event, DiscordListener discordListener, List<String> params) {
     RequestBuffer.request(() -> event.getChannel().sendMessage("You mom gay, " + event.getAuthor().getName() + "."));
+    discordListener.getGuildAudioPlayer(event.getGuild()).scheduler.pausePlaying();
   }
 
   @Override
