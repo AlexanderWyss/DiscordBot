@@ -1,6 +1,7 @@
 package wyss.website.discordbot.music;
 
 import java.nio.ByteBuffer;
+import java.time.Instant;
 
 import com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -18,6 +19,8 @@ class LavaplayerAudioProvider extends AudioProvider {
     this.player = player;
     this.frame.setBuffer(getBuffer());
   }
+
+  Instant lastInstant = Instant.now();
 
   @Override
   public boolean provide() {

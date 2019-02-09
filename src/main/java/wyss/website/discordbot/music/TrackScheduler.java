@@ -10,9 +10,10 @@ public class TrackScheduler extends AudioEventAdapter {
 
   public TrackScheduler(AudioPlayer player) {
     this.player = player;
+    player.addListener(this);
   }
 
   public void play(AudioTrack track) {
-    player.playTrack(track);
+    player.startTrack(track, false);
   }
 }
