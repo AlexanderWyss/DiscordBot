@@ -1,5 +1,7 @@
 package wyss.website.discordbot.music;
 
+import java.util.stream.Collectors;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -17,16 +19,17 @@ public class AudioLoader {
   }
 
   public void play(String url) {
-    manager.loadItem(url, new AudioLoadResultHandler() {
+    manager.loadItemOrdered(manager, url, new AudioLoadResultHandler() {
 
       @Override
       public void trackLoaded(AudioTrack track) {
-        scheduler.play(track);
+        scheduler.playNow(new Audio(track));
       }
 
       @Override
       public void playlistLoaded(AudioPlaylist playlist) {
-        scheduler.play(playlist.getTracks().get(0));
+        scheduler.playNow(
+            playlist.getTracks().stream().map(audioTrack -> new Audio(audioTrack)).collect(Collectors.toList()));
       }
 
       @Override

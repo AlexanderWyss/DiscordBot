@@ -19,6 +19,13 @@
 					<source>11</source>
 					<target>11</target>
 				</configuration>
+				<dependencies>
+        			<dependency>
+            			<groupId>org.ow2.asm</groupId>
+            			<artifactId>asm</artifactId>
+            			<version>6.2</version>
+        			</dependency>
+   				 </dependencies>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -61,9 +68,14 @@
 			<url>http://repo.maven.apache.org/maven2</url>
 		</repository>
 		<repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-   </repository>
+      		<id>jitpack.io</id>
+      		<url>https://jitpack.io</url>
+   		</repository>
+   		  <repository>
+       		<id>jvnet-nexus-staging</id>
+			<url>http://maven.java.net/content/repositories/staging/</url>
+        	<layout>default</layout>
+    	</repository>
 	</repositories>
 	<dependencies>
     <dependency>

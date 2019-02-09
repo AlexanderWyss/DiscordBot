@@ -25,7 +25,6 @@ public class GuildManager {
   }
 
   private void play(MessageCreateEvent event, GuildMusicManager guildMusicManager) {
-    System.out.println("play");
     String command = event.getMessage().getContent().get();
     if (command.contains(" ")) {
       String url = command.substring(command.indexOf(" ")).trim();
