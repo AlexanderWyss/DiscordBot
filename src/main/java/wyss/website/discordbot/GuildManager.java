@@ -1,14 +1,19 @@
 package wyss.website.discordbot;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.util.Snowflake;
+import reactor.core.publisher.Flux;
 import wyss.website.discordbot.commands.Command;
 import wyss.website.discordbot.commands.Helper;
 import wyss.website.discordbot.music.GuildMusicManager;
@@ -45,8 +50,16 @@ public class GuildManager {
         event.getMessage().getContent().orElse("")).find();
   }
 
-  private boolean isGuild(MessageCreateEvent event) {
-    return event.getGuildId().map(id -> guild.getId().equals(id)).orElse(false);
+  @SuppressWarnings("unchecked")
+  private boolean isGuild(Event event) {
+    try {
+      return ((Optional<Snowflake>) event.getClass().getMethod("getGuildId").invoke(event))
+          .map(id -> guild.getId().equals(id)).orElse(false);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+        | SecurityException e) {
+      LOGGER.warn("getGuildId reflection Error", e);
+      return true;
+    }
   }
 
   public String getCommandPrefix() {
@@ -67,5 +80,9 @@ public class GuildManager {
 
   public List<Command> getCommands() {
     return commands;
+  }
+
+  public <T extends Event> Flux<T> on(Class<T> clazz) {
+    return client.getEventDispatcher().on(clazz).filter(this::isGuild);
   }
 }

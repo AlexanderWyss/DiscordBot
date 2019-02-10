@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 import wyss.website.discordbot.GuildManager;
 
 public class GuildMusicManager {
-
   private final TrackScheduler scheduler;
 
   private AudioLoader audioLoader;
@@ -50,6 +49,10 @@ public class GuildMusicManager {
 
   public AudioLoader getAudioLoader() {
     return audioLoader;
+  }
+
+  public AudioPlayer getPlayer() {
+    return player;
   }
 
   public static GuildMusicManager build(GuildManager manager) {

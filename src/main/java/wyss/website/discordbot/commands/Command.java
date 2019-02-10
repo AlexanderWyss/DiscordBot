@@ -9,6 +9,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.spec.MessageCreateSpec;
 import reactor.core.publisher.Mono;
 import wyss.website.discordbot.GuildManager;
+import wyss.website.discordbot.commands.music.MusicPanelCommand;
 import wyss.website.discordbot.commands.music.PlayCommand;
 
 public abstract class Command {
@@ -47,6 +48,7 @@ public abstract class Command {
       {
         add(new HelpCommand(manager));
         add(new PlayCommand(manager));
+        add(new MusicPanelCommand(manager));
       }
     };
   }
