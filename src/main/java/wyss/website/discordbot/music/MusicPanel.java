@@ -1,13 +1,13 @@
 package wyss.website.discordbot.music;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
@@ -18,11 +18,10 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Mono;
 import wyss.website.discordbot.GuildManager;
 
 public class MusicPanel implements Observer {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(MusicPanel.class);
 
   private static final String TITLE = "Music Panel";
   private static final String REPEATE_LIST = "\uD83D\uDD01";
@@ -134,9 +133,12 @@ public class MusicPanel implements Observer {
     return repeateContent;
   }
 
+  private Instant lastUpdate;
+
   @Override
   public void update() {
-    LOGGER.info("Update");
-    message.thenAccept(message -> message.edit(spec -> spec.setEmbed(build())).subscribe());
+    lastUpdate = Instant.now();
+    Mono.just(lastUpdate).delayElement(Duration.ofMillis(50)).filter(lastUpdate::equals)
+        .subscribe(v -> message.thenAccept(message -> message.edit(spec -> spec.setEmbed(build())).subscribe()));
   }
 }

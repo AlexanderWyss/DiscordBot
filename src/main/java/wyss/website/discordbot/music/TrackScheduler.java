@@ -15,7 +15,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 public class TrackScheduler extends AudioEventAdapter implements Observer {
 
-  private static final int VOLUME_STEP = 20;
+  private static final int VOLUME_STEP = 10;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TrackScheduler.class);
 
@@ -138,12 +138,12 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
   }
 
   public void setVolume(int volume) {
-    player.setVolume(volume);
+    player.setVolume(volume * 10);
     updateAll();
   }
 
   public int getVolume() {
-    return player.getVolume();
+    return player.getVolume() / 10;
   }
 
   @Override

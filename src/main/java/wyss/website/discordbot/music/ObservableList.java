@@ -5,19 +5,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ObservableList<E> extends ArrayList<E> {
 
   private static final long serialVersionUID = 2780525358637621254L;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ObservableList.class);
-
   @Override
   public void add(int index, E element) {
     super.add(index, element);
-    LOGGER.info("add Index: {} Element: {}", index, element);
     updateAll();
   }
 
@@ -79,22 +73,8 @@ public class ObservableList<E> extends ArrayList<E> {
   @Override
   public boolean add(E e) {
     boolean add = super.add(e);
-    LOGGER.info("add Element: {}", e);
     updateAll();
     return add;
-  }
-
-  @Override
-  public int size() {
-    int size = super.size();
-    LOGGER.info("Size: {}", size);
-    return size;
-  }
-
-  @Override
-  public E get(int index) {
-    LOGGER.info("Get: {} ", index);
-    return super.get(index);
   }
 
   private List<Observer> observers = new ArrayList<>();
