@@ -15,20 +15,59 @@ public class TrackScheduler extends AudioEventAdapter {
   private List<Audio> audioTracks = new ObservableList<>();
   private int index = -1;
 
+  private Repeat repeat = Repeat.NONE;
+
   public TrackScheduler(AudioPlayer player) {
     this.player = player;
     player.addListener(this);
   }
 
   public void playNow(Audio track) {
-    addNext(track);
+    playNext(track);
     next();
   }
 
   public void playNow(List<Audio> playlist) {
-    Collections.reverse(playlist);
-    playlist.forEach(this::addNext);
+    playNext(playlist);
     next();
+  }
+
+  public void playNext(Audio track) {
+    audioTracks.add(index + 1, track);
+  }
+
+  public void playNext(List<Audio> playlist) {
+    Collections.reverse(playlist);
+    playlist.forEach(this::playNext);
+  }
+
+  public void queue(Audio audio) {
+    audioTracks.add(audio);
+  }
+
+  public void queue(List<Audio> playlist) {
+    playlist.forEach(this::queue);
+  }
+
+  public void clear() {
+    player.playTrack(null);
+    audioTracks.clear();
+    index = -1;
+  }
+
+  public void next() {
+    if (repeat.equals(Repeat.SONG)) {
+      index--;
+    }
+    if (index < audioTracks.size() - 1) {
+      player.playTrack(audioTracks.get(++index));
+      resume();
+    } else {
+      if (repeat.equals(Repeat.LIST)) {
+        index = -1;
+        next();
+      }
+    }
   }
 
   public void resume() {
@@ -47,18 +86,12 @@ public class TrackScheduler extends AudioEventAdapter {
     player.setPaused(!player.isPaused());
   }
 
-  public void next() {
-    if (index < audioTracks.size() - 1) {
-      player.playTrack(audioTracks.get(++index));
-      resume();
-    } else {
-      index = -1;
-      next();
-    }
+  public void setRepeat(Repeat repeat) {
+    this.repeat = repeat;
   }
 
-  public void addNext(Audio track) {
-    audioTracks.add(index + 1, track);
+  public Repeat getRepeat() {
+    return repeat;
   }
 
   @Override

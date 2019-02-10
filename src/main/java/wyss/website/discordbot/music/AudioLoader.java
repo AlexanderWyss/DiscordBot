@@ -1,5 +1,6 @@
 package wyss.website.discordbot.music;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -17,25 +18,70 @@ public class AudioLoader {
     this.scheduler = scheduler;
   }
 
-  public void play(String url, AbstractAudioLoadResultHandler audioLoadResultHandler) {
-    Optional<AbstractAudioLoadResultHandler> resultHandler = Optional.ofNullable(audioLoadResultHandler);
-    manager.loadItem(url, new ObservableAudioLoadResultHandler(resultHandler) {
-      @Override
-      public void trackLoaded(AudioTrack track) {
-        scheduler.playNow(new Audio(track));
-        super.trackLoaded(track);
-      }
+  public void playNow(String url, AbstractAudioLoadResultHandler audioLoadResultHandler) {
+    manager.loadItemOrdered(url, url,
+        new ObservableAudioLoadResultHandler(Optional.ofNullable(audioLoadResultHandler)) {
+          @Override
+          public void trackLoaded(AudioTrack track) {
+            scheduler.playNow(new Audio(track));
+            super.trackLoaded(track);
+          }
 
-      @Override
-      public void playlistLoaded(AudioPlaylist playlist) {
-        scheduler.playNow(
-            playlist.getTracks().stream().map(audioTrack -> new Audio(audioTrack)).collect(Collectors.toList()));
-        super.playlistLoaded(playlist);
-      }
-    });
+          @Override
+          public void playlistLoaded(AudioPlaylist playlist) {
+            scheduler.playNow(wrapAudio(playlist));
+            super.playlistLoaded(playlist);
+          }
+        });
   }
 
-  public void play(String url) {
-    play(url, null);
+  public void playNow(String url) {
+    playNow(url, null);
+  }
+
+  public void playNext(String url, AbstractAudioLoadResultHandler audioLoadResultHandler) {
+    manager.loadItemOrdered(url, url,
+        new ObservableAudioLoadResultHandler(Optional.ofNullable(audioLoadResultHandler)) {
+          @Override
+          public void trackLoaded(AudioTrack track) {
+            scheduler.playNext(new Audio(track));
+            super.trackLoaded(track);
+          }
+
+          @Override
+          public void playlistLoaded(AudioPlaylist playlist) {
+            scheduler.playNext(wrapAudio(playlist));
+            super.playlistLoaded(playlist);
+          }
+        });
+  }
+
+  public void playNext(String url) {
+    playNext(url, null);
+  }
+
+  public void queue(String url, AbstractAudioLoadResultHandler audioLoadResultHandler) {
+    manager.loadItemOrdered(url, url,
+        new ObservableAudioLoadResultHandler(Optional.ofNullable(audioLoadResultHandler)) {
+          @Override
+          public void trackLoaded(AudioTrack track) {
+            scheduler.queue(new Audio(track));
+            super.trackLoaded(track);
+          }
+
+          @Override
+          public void playlistLoaded(AudioPlaylist playlist) {
+            scheduler.queue(wrapAudio(playlist));
+            super.playlistLoaded(playlist);
+          }
+        });
+  }
+
+  public void queue(String url) {
+    queue(url, null);
+  }
+
+  private List<Audio> wrapAudio(AudioPlaylist playlist) {
+    return playlist.getTracks().stream().map(audioTrack -> new Audio(audioTrack)).collect(Collectors.toList());
   }
 }

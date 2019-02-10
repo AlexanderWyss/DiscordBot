@@ -2,9 +2,11 @@ package wyss.website.discordbot.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
+import discord4j.core.spec.MessageCreateSpec;
 import reactor.core.publisher.Mono;
 import wyss.website.discordbot.GuildManager;
 import wyss.website.discordbot.commands.music.PlayCommand;
@@ -35,14 +37,25 @@ public abstract class Command {
     return event.getMessage().getChannel().flatMap(channel -> channel.createMessage(message));
   }
 
+  protected Mono<Message> reply(MessageCreateEvent event, Consumer<MessageCreateSpec> message) {
+    return event.getMessage().getChannel().flatMap(channel -> channel.createMessage(message));
+  }
+
   @SuppressWarnings("serial")
   public static List<Command> list(GuildManager manager) {
     return new ArrayList<>() {
       {
+        add(new HelpCommand(manager));
         add(new PlayCommand(manager));
       }
     };
   }
 
   public abstract void execute(MessageCreateEvent event);
+
+  public abstract String getDescription();
+
+  public String getParameterDescription() {
+    return "";
+  }
 }

@@ -2,7 +2,6 @@ package wyss.website.discordbot;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +10,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import wyss.website.discordbot.commands.Command;
+import wyss.website.discordbot.commands.Helper;
 import wyss.website.discordbot.music.GuildMusicManager;
 
 public class GuildManager {
@@ -41,8 +41,8 @@ public class GuildManager {
   }
 
   private Predicate<? super Command> commands(MessageCreateEvent event) {
-    return command -> Pattern.compile(COMMAND_PREFIX + command.getIdentifier() + "\\b", Pattern.CASE_INSENSITIVE)
-        .matcher(event.getMessage().getContent().orElse("")).find();
+    return command -> Helper.matcherCaseInsensitive("^" + COMMAND_PREFIX + command.getIdentifier() + "\\b",
+        event.getMessage().getContent().orElse("")).find();
   }
 
   private boolean isGuild(MessageCreateEvent event) {

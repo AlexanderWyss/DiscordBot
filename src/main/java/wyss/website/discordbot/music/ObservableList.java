@@ -19,6 +19,12 @@ public class ObservableList<E> extends ArrayList<E> {
   }
 
   @Override
+  public boolean add(E e) {
+    LOGGER.info("add Element: {}", e);
+    return super.add(e);
+  }
+
+  @Override
   public int size() {
     int size = super.size();
     LOGGER.info("Size: {}", size);
