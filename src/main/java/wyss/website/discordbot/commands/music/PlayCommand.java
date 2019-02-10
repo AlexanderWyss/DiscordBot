@@ -23,8 +23,10 @@ public class PlayCommand extends Command {
     AudioLoader audioLoader = getManager().getGuildMusicManager().getAudioLoader();
     Helper.commandMapper().map("now", param -> audioLoader.playNow(param, new MessageSender(param, event)))
         .map("next", param -> audioLoader.playNext(param, new MessageSender(param, event)))
-        .map("queue", param -> audioLoader.queue(param, new MessageSender(param, event)))
-        .execute(cutOffCommand(event), "now");
+        .map("queue", param -> audioLoader.queue(param, new MessageSender(param, event))).map("replace", param -> {
+          getManager().getGuildMusicManager().getScheduler().clear();
+          audioLoader.playNow(param, new MessageSender(param, event));
+        }).execute(cutOffCommand(event), "now");
     getManager().getGuildMusicManager().join(event.getMember().get()).subscribe();
   }
 
@@ -62,6 +64,6 @@ public class PlayCommand extends Command {
 
   @Override
   public String getParameterDescription() {
-    return "<now(default)|next|queue> <identifier>";
+    return "<now(default)|next|queue|replace> <identifier>";
   }
 }

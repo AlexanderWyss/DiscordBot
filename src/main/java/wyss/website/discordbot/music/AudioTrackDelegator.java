@@ -93,7 +93,7 @@ public abstract class AudioTrackDelegator implements InternalAudioTrack {
 
   @Override
   public AudioTrack makeClone() {
-    return audioTrack.makeClone();
+    return new Audio(audioTrack.makeClone());
   }
 
   @Override

@@ -1,7 +1,6 @@
 package wyss.website.discordbot.music;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -47,8 +46,7 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
   }
 
   public void playNext(List<Audio> playlist) {
-    Collections.reverse(playlist);
-    playlist.forEach(this::playNext);
+    audioTracks.addAll(index + 1, playlist);
   }
 
   public void queue(Audio audio) {
@@ -56,7 +54,7 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
   }
 
   public void queue(List<Audio> playlist) {
-    playlist.forEach(this::queue);
+    audioTracks.addAll(playlist);
   }
 
   public void clear() {
@@ -78,7 +76,7 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
   }
 
   private void play(Audio track) {
-    player.playTrack(track.makeClone());
+    player.playTrack(track == null ? null : track.makeClone());
   }
 
   public void previous() {

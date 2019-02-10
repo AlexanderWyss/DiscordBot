@@ -1,7 +1,5 @@
 package wyss.website.discordbot.music;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -18,7 +16,6 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Mono;
 import wyss.website.discordbot.GuildManager;
 
 public class MusicPanel implements Observer {
@@ -133,12 +130,9 @@ public class MusicPanel implements Observer {
     return repeateContent;
   }
 
-  private Instant lastUpdate;
-
   @Override
   public void update() {
-    lastUpdate = Instant.now();
-    Mono.just(lastUpdate).delayElement(Duration.ofMillis(50)).filter(lastUpdate::equals)
-        .subscribe(v -> message.thenAccept(message -> message.edit(spec -> spec.setEmbed(build())).subscribe()));
+    System.out.println("update");
+    message.thenAccept(message -> message.edit(spec -> spec.setEmbed(build())).subscribe());
   }
 }
