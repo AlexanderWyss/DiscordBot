@@ -13,52 +13,54 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
+import wyss.website.discordbot.GuildManager;
 
 public class GuildMusicManager {
-  private final TrackScheduler scheduler;
 
-  private final LavaplayerAudioProvider audioProvider;
+  private final TrackScheduler scheduler;
 
   private AudioLoader audioLoader;
 
-  public GuildMusicManager(AudioPlayerManager manager) {
-    AudioPlayer player = manager.createPlayer();
+  private GuildManager guildManager;
+
+  private AudioPlayer player;
+
+  public GuildMusicManager(AudioPlayerManager manager, GuildManager guildManager) {
+    this.guildManager = guildManager;
+    player = manager.createPlayer();
     scheduler = new TrackScheduler(player);
-    audioProvider = new LavaplayerAudioProvider(player);
     audioLoader = new AudioLoader(manager, scheduler);
   }
 
   public Mono<VoiceConnection> join(VoiceChannel channel) {
     return channel.join(spec -> {
-      spec.setProvider(audioProvider);
+      spec.setProvider(new LavaplayerAudioProvider(player));
     });
   }
 
   public Mono<VoiceConnection> join(Member member) {
-    return member.getVoiceState().flatMap(VoiceState::getChannel).flatMap(this::join);
+    return member.getVoiceState().flatMap(VoiceState::getChannel).filterWhen(
+        channel -> channel.getGuild().map(channelGuild -> guildManager.getGuild().getId().equals(channelGuild.getId())))
+        .flatMap(this::join);
   }
 
   public TrackScheduler getScheduler() {
     return scheduler;
   }
 
-  public LavaplayerAudioProvider getAudioProvider() {
-    return audioProvider;
-  }
-
   public AudioLoader getAudioLoader() {
     return audioLoader;
   }
 
-  public static GuildMusicManager build() {
-    return new GuildMusicManagerBuilder().build();
+  public static GuildMusicManager build(GuildManager manager) {
+    return new GuildMusicManagerBuilder().build(manager);
   }
 
   private static class GuildMusicManagerBuilder {
     private static Optional<AudioPlayerManager> playerManager = Optional.empty();
 
-    private GuildMusicManager build() {
-      return new GuildMusicManager(playerManager.orElse(createAudioPlayerManager()));
+    private GuildMusicManager build(GuildManager manager) {
+      return new GuildMusicManager(playerManager.orElse(createAudioPlayerManager()), manager);
     }
 
     private AudioPlayerManager createAudioPlayerManager() {

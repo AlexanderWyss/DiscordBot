@@ -48,8 +48,13 @@ public class TrackScheduler extends AudioEventAdapter {
   }
 
   public void next() {
-    player.playTrack(audioTracks.get(++index));
-    resume();
+    if (index < audioTracks.size() - 1) {
+      player.playTrack(audioTracks.get(++index));
+      resume();
+    } else {
+      index = -1;
+      next();
+    }
   }
 
   public void addNext(Audio track) {
@@ -58,6 +63,8 @@ public class TrackScheduler extends AudioEventAdapter {
 
   @Override
   public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-    next();
+    if (endReason.mayStartNext) {
+      next();
+    }
   }
 }
