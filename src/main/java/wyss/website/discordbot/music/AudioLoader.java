@@ -82,6 +82,6 @@ public class AudioLoader {
   }
 
   private List<Audio> wrapAudio(AudioPlaylist playlist) {
-    return playlist.getTracks().stream().map(audioTrack -> new Audio(audioTrack)).collect(Collectors.toList());
+    return playlist.getTracks().stream().map(Audio::new).collect(Collectors.toList());
   }
 }

@@ -5,6 +5,9 @@ import java.util.regex.Pattern;
 
 public class Helper {
 
+  private Helper() {
+  }
+
   public static Matcher matcherCaseInsensitive(String pattern, String string) {
     return Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(string);
   }

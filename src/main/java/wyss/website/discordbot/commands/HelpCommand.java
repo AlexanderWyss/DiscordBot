@@ -17,11 +17,9 @@ public class HelpCommand extends Command {
         .map(command -> getManager().getCommandPrefix() + command.getIdentifier() + " "
             + command.getParameterDescription() + " - " + command.getDescription())
         .collect(Collectors.joining(System.lineSeparator()));
-    reply(event, spec -> {
-      spec.setEmbed(specEmbed -> {
-        specEmbed.setTitle("Command - Description").setDescription(description);
-      });
-    }).subscribe();
+    reply(event,
+        spec -> spec.setEmbed(specEmbed -> specEmbed.setTitle("Command - Description").setDescription(description)))
+            .subscribe();
   }
 
   @Override

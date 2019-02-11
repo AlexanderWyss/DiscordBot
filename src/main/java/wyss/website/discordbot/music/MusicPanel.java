@@ -47,27 +47,27 @@ public class MusicPanel implements Observer {
 
   private Map<ReactionEmoji, Consumer<GuildMusicManager>> createControls() {
     Map<ReactionEmoji, Consumer<GuildMusicManager>> map = new LinkedHashMap<>();
-    map.put(ARROW_BACK, manager -> manager.getScheduler().previous());
-    map.put(PAUSE_PLAY, manager -> manager.getScheduler().togglePause());
-    map.put(ARROW_FORWARD, manager -> manager.getScheduler().next());
-    map.put(VOLUME_DOWN, manager -> manager.getScheduler().volumeDown());
-    map.put(VOLUME_UP, manager -> manager.getScheduler().volumeUp());
+    map.put(ARROW_BACK, musicManager -> musicManager.getScheduler().previous());
+    map.put(PAUSE_PLAY, musicManager -> musicManager.getScheduler().togglePause());
+    map.put(ARROW_FORWARD, musicManager -> musicManager.getScheduler().next());
+    map.put(VOLUME_DOWN, musicManager -> musicManager.getScheduler().volumeDown());
+    map.put(VOLUME_UP, musicManager -> musicManager.getScheduler().volumeUp());
     map.put(REPEATE_LIST_EMOJI, toggleRepeatList());
     map.put(REPEATE_SONG_EMOJI, toggleRepeatSong());
-    map.put(REMOVE, manager -> manager.getScheduler().removeCurrentSong());
+    map.put(REMOVE, musicManager -> musicManager.getScheduler().removeCurrentSong());
     return map;
   }
 
   private Consumer<GuildMusicManager> toggleRepeatSong() {
-    return manager -> {
-      TrackScheduler scheduler = manager.getScheduler();
+    return musicManager -> {
+      TrackScheduler scheduler = musicManager.getScheduler();
       scheduler.setRepeat(scheduler.getRepeat().equals(Repeat.SONG) ? Repeat.NONE : Repeat.SONG);
     };
   }
 
   private Consumer<GuildMusicManager> toggleRepeatList() {
-    return manager -> {
-      TrackScheduler scheduler = manager.getScheduler();
+    return musicManager -> {
+      TrackScheduler scheduler = musicManager.getScheduler();
       scheduler.setRepeat(scheduler.getRepeat().equals(Repeat.LIST) ? Repeat.NONE : Repeat.LIST);
     };
   }
@@ -117,22 +117,21 @@ public class MusicPanel implements Observer {
   private String getRepeat(Repeat repeat) {
     String repeateContent;
     switch (repeat) {
-    case LIST:
-      repeateContent = REPEATE_LIST;
-      break;
-    case SONG:
-      repeateContent = REPEATE_SONG;
-      break;
-    default:
-      repeateContent = "None";
-      break;
+      case LIST:
+        repeateContent = REPEATE_LIST;
+        break;
+      case SONG:
+        repeateContent = REPEATE_SONG;
+        break;
+      default:
+        repeateContent = "None";
+        break;
     }
     return repeateContent;
   }
 
   @Override
   public void update() {
-    System.out.println("update");
     message.thenAccept(message -> message.edit(spec -> spec.setEmbed(build())).subscribe());
   }
 }

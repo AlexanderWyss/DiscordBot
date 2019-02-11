@@ -32,9 +32,7 @@ public class GuildMusicManager {
   }
 
   public Mono<VoiceConnection> join(VoiceChannel channel) {
-    return channel.join(spec -> {
-      spec.setProvider(new LavaplayerAudioProvider(player));
-    });
+    return channel.join(spec -> spec.setProvider(new LavaplayerAudioProvider(player)));
   }
 
   public Mono<VoiceConnection> join(Member member) {
@@ -66,7 +64,7 @@ public class GuildMusicManager {
       return new GuildMusicManager(playerManager.orElse(createAudioPlayerManager()), manager);
     }
 
-    private AudioPlayerManager createAudioPlayerManager() {
+    private static AudioPlayerManager createAudioPlayerManager() {
       playerManager = Optional.of(new DefaultAudioPlayerManager());
       playerManager.get().getConfiguration().setFrameBufferFactory(AllocatingAudioFrameBuffer::new);
       AudioSourceManagers.registerRemoteSources(playerManager.get());

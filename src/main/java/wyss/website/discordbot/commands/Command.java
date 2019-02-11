@@ -42,15 +42,12 @@ public abstract class Command {
     return event.getMessage().getChannel().flatMap(channel -> channel.createMessage(message));
   }
 
-  @SuppressWarnings("serial")
   public static List<Command> list(GuildManager manager) {
-    return new ArrayList<Command>() {
-      {
-        add(new HelpCommand(manager));
-        add(new PlayCommand(manager));
-        add(new MusicPanelCommand(manager));
-      }
-    };
+    List<Command> list = new ArrayList<>();
+    list.add(new HelpCommand(manager));
+    list.add(new PlayCommand(manager));
+    list.add(new MusicPanelCommand(manager));
+    return list;
   }
 
   public abstract void execute(MessageCreateEvent event);

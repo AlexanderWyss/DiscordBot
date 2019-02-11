@@ -75,10 +75,6 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
     }
   }
 
-  private void play(Audio track) {
-    player.playTrack(track == null ? null : track.makeClone());
-  }
-
   public void previous() {
     if (index - 1 >= 0) {
       index -= 2;
@@ -90,6 +86,10 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
       }
     }
     next();
+  }
+
+  private void play(Audio track) {
+    player.playTrack(track == null ? null : track.makeClone());
   }
 
   public void removeCurrentSong() {
@@ -144,6 +144,22 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
     return player.getVolume() / 10;
   }
 
+  public Audio getCurrentTrack() {
+    try {
+      return audioTracks.get(index);
+    } catch (IndexOutOfBoundsException e) {
+      return null;
+    }
+  }
+
+  public int getAmountOfSongsPreviously() {
+    return index;
+  }
+
+  public int getAmountOfSongsInQueue() {
+    return audioTracks.size() - (index + 1);
+  }
+
   @Override
   public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
     if (endReason.mayStartNext) {
@@ -178,22 +194,6 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
   public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
     LOGGER.warn("Track stuck");
     next();
-  }
-
-  public Audio getCurrentTrack() {
-    try {
-      return audioTracks.get(index);
-    } catch (IndexOutOfBoundsException e) {
-      return null;
-    }
-  }
-
-  public int getAmountOfSongsPreviously() {
-    return index;
-  }
-
-  public int getAmountOfSongsInQueue() {
-    return audioTracks.size() - (index + 1);
   }
 
   private List<Observer> observers = new ArrayList<>();

@@ -22,7 +22,7 @@ public class GuildManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GuildManager.class);
 
-  private final String COMMAND_PREFIX = "!";
+  private static final String COMMAND_PREFIX = "!";
   private Guild guild;
   private DiscordClient client;
   private GuildMusicManager guildMusicManager;
@@ -35,7 +35,7 @@ public class GuildManager {
     guildMusicManager = GuildMusicManager.build(this);
     client.getEventDispatcher().on(MessageCreateEvent.class).filter(this::isGuild)
         .filter(event -> event.getMessage().getContent().map(message -> message.startsWith(COMMAND_PREFIX)).get())
-        .subscribe(event -> executeCommand(event));
+        .subscribe(this::executeCommand);
   }
 
   private void executeCommand(MessageCreateEvent event) {
