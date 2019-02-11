@@ -10,7 +10,6 @@
 	<name>discordbot</name>
 	<url>http://maven.apache.org</url>
 	<build>
-		<pluginManagement>
 			<plugins>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -26,34 +25,6 @@
 	            			<version>6.2</version>
 	        			</dependency>
 	   				 </dependencies>
-				</plugin>
-				<plugin>
-	                <groupId>org.apache.maven.plugins</groupId>
-	                <artifactId>maven-dependency-plugin</artifactId>
-	                <executions>
-	                    <execution>
-	                        <id>unpack</id>
-	                        <phase>generate-sources</phase>
-	                        <goals>
-	                            <goal>unpack</goal>
-	                        </goals>
-	                        <configuration>
-	                            <artifactItems>
-	                                <artifactItem>
-	                                    <groupId>com.discord4j</groupId>
-	                                    <artifactId>discord4j-voice</artifactId>
-	                                    <version>3.0.0.M2</version>
-	                                    <type>jar</type>
-	                                    <overWrite>true</overWrite>
-	                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
-	                                    <excludes>
-	                                        discord4j.voice.VoiceSendTask.class
-	                                    </excludes>
-	                                </artifactItem>
-	                            </artifactItems>
-	                        </configuration>
-	                    </execution>
-	                </executions>
 				</plugin>
 				<plugin>
 					<artifactId>maven-assembly-plugin</artifactId>
@@ -80,7 +51,6 @@
 					</executions>
 				</plugin>
 			</plugins>
-		</pluginManagement>
 	</build>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
