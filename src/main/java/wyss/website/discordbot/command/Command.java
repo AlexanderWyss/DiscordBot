@@ -10,10 +10,17 @@ import discord4j.core.spec.MessageCreateSpec;
 import reactor.core.publisher.Mono;
 import wyss.website.discordbot.GuildManager;
 import wyss.website.discordbot.command.general.HelpCommand;
+import wyss.website.discordbot.music.commands.ClearCommand;
 import wyss.website.discordbot.music.commands.JoinCommand;
 import wyss.website.discordbot.music.commands.LeaveCommand;
 import wyss.website.discordbot.music.commands.MusicPanelCommand;
+import wyss.website.discordbot.music.commands.NextCommand;
+import wyss.website.discordbot.music.commands.PauseCommand;
 import wyss.website.discordbot.music.commands.PlayCommand;
+import wyss.website.discordbot.music.commands.PreviousCommand;
+import wyss.website.discordbot.music.commands.RepeatCommand;
+import wyss.website.discordbot.music.commands.ResumeCommand;
+import wyss.website.discordbot.music.commands.VolumeCommand;
 
 public abstract class Command {
   private GuildManager manager;
@@ -56,6 +63,13 @@ public abstract class Command {
     list.add(new MusicPanelCommand(manager));
     list.add(new JoinCommand(manager));
     list.add(new LeaveCommand(manager));
+    list.add(new ClearCommand(manager));
+    list.add(new NextCommand(manager));
+    list.add(new PreviousCommand(manager));
+    list.add(new RepeatCommand(manager));
+    list.add(new PauseCommand(manager));
+    list.add(new ResumeCommand(manager));
+    list.add(new VolumeCommand(manager));
     return list;
   }
 }

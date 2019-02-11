@@ -15,14 +15,16 @@ public class CommandMapper {
 
   ConcurrentHashMap<String, Consumer<String>> commandMap = new ConcurrentHashMap<>();
 
+  private boolean noParams;
+
   public CommandMapper map(String identifier, Consumer<String> command) {
     commandMap.put(identifier, command);
     return this;
   }
 
   public boolean execute(String command, String defaultIdentifier) {
-    Matcher matcher = Helper
-        .matcherCaseInsensitive("^" + getCommandPattern(defaultIdentifier != null) + "\\s*(?<params>.+)?", command);
+    Matcher matcher = Helper.matcherCaseInsensitive(
+        "^" + getCommandPattern(defaultIdentifier != null) + "\\s*(?<params>" + (noParams ? "" : ".+") + ")?", command);
     if (matcher.matches()) {
       String identifier = matcher.group("command");
       if (identifier == null && defaultIdentifier != null) {
@@ -31,7 +33,12 @@ public class CommandMapper {
 
       String params = matcher.group("params");
       LOGGER.info("ident: {}, params: {}", identifier, params);
-      commandMap.get(identifier).accept(params);
+      Consumer<String> consumer = commandMap.get(identifier);
+      if (consumer != null) {
+        consumer.accept(params);
+      } else {
+        return false;
+      }
       return true;
     } else {
       return false;
@@ -45,5 +52,10 @@ public class CommandMapper {
   private String getCommandPattern(boolean withDefault) {
     return "(?<command>" + Collections.list(commandMap.keys()).stream().collect(Collectors.joining("|")) + ")"
         + (withDefault ? "?" : "");
+  }
+
+  public CommandMapper noParams() {
+    noParams = true;
+    return this;
   }
 }
