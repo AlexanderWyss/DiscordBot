@@ -1,4 +1,4 @@
-package wyss.website.discordbot.commands;
+package wyss.website.discordbot.command;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

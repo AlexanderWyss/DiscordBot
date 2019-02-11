@@ -1,10 +1,13 @@
-package wyss.website.discordbot.commands;
+package wyss.website.discordbot.command.commands;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import wyss.website.discordbot.GuildManager;
+import wyss.website.discordbot.command.Command;
+import wyss.website.discordbot.command.CommandExecutor;
+import wyss.website.discordbot.command.Help;
 
 public class HelpCommand extends Command {
 

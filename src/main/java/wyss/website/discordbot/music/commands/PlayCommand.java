@@ -1,4 +1,4 @@
-package wyss.website.discordbot.commands.music;
+package wyss.website.discordbot.music.commands;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -7,9 +7,9 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import wyss.website.discordbot.GuildManager;
-import wyss.website.discordbot.commands.Command;
-import wyss.website.discordbot.commands.Help;
-import wyss.website.discordbot.commands.Helper;
+import wyss.website.discordbot.command.Command;
+import wyss.website.discordbot.command.Help;
+import wyss.website.discordbot.command.Helper;
 import wyss.website.discordbot.music.AbstractAudioLoadResultHandler;
 import wyss.website.discordbot.music.AudioLoader;
 

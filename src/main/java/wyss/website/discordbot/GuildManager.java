@@ -11,7 +11,7 @@ import discord4j.core.event.domain.Event;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Flux;
-import wyss.website.discordbot.commands.CommandExecutor;
+import wyss.website.discordbot.command.CommandExecutor;
 import wyss.website.discordbot.music.GuildMusicManager;
 
 public class GuildManager {

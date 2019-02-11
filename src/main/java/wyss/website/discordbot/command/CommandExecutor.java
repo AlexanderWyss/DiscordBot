@@ -1,4 +1,4 @@
-package wyss.website.discordbot.commands;
+package wyss.website.discordbot.command;
 
 import java.util.List;
 import java.util.function.Predicate;
