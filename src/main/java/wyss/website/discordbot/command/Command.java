@@ -18,6 +18,7 @@ import wyss.website.discordbot.music.commands.NextCommand;
 import wyss.website.discordbot.music.commands.PauseCommand;
 import wyss.website.discordbot.music.commands.PlayCommand;
 import wyss.website.discordbot.music.commands.PreviousCommand;
+import wyss.website.discordbot.music.commands.RemoveCommand;
 import wyss.website.discordbot.music.commands.RepeatCommand;
 import wyss.website.discordbot.music.commands.ResumeCommand;
 import wyss.website.discordbot.music.commands.VolumeCommand;
@@ -70,6 +71,7 @@ public abstract class Command {
     list.add(new PauseCommand(manager));
     list.add(new ResumeCommand(manager));
     list.add(new VolumeCommand(manager));
+    list.add(new RemoveCommand(manager));
     return list;
   }
 }

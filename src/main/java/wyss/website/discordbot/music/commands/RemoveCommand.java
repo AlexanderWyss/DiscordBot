@@ -5,19 +5,19 @@ import wyss.website.discordbot.GuildManager;
 import wyss.website.discordbot.command.Command;
 import wyss.website.discordbot.command.Help;
 
-public class ResumeCommand extends Command {
+public class RemoveCommand extends Command {
 
-  public ResumeCommand(GuildManager manager) {
-    super(manager, "resume");
+  public RemoveCommand(GuildManager manager) {
+    super(manager, "remove");
   }
 
   @Override
   public void execute(MessageCreateEvent event) {
-    getManager().getGuildMusicManager().getScheduler().resume();
+    getManager().getGuildMusicManager().getScheduler().removeCurrentSong();
   }
 
   @Override
   public Help getHelp() {
-    return new Help("Resumes the music playback", "");
+    return new Help("Removes the current song from the queue", "");
   }
 }

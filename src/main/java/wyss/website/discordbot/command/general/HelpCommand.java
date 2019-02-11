@@ -20,13 +20,19 @@ public class HelpCommand extends Command {
     CommandExecutor commandExecutor = getManager().getCommandExecutor();
     String description = commandExecutor.getCommands().stream().map(command -> {
       Help help = command.getHelp();
-      return commandExecutor.getPrefix() + command.getIdentifier() + " "
-          + Arrays.stream(help.getParameters()).collect(Collectors.joining("> <", "<", ">")) + " - "
+      return commandExecutor.getPrefix() + command.getIdentifier() + " " + getParams(help.getParameters()) + " - "
           + help.getShortDescription();
     }).collect(Collectors.joining(System.lineSeparator()));
     reply(event,
         spec -> spec.setEmbed(specEmbed -> specEmbed.setTitle("Command - Description").setDescription(description)))
             .subscribe();
+  }
+
+  private String getParams(String[] params) {
+    if (params.length == 0) {
+      return "";
+    }
+    return Arrays.stream(params).collect(Collectors.joining("> <", "<", ">"));
   }
 
   @Override
