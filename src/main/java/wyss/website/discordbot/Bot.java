@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
@@ -17,6 +18,12 @@ public class Bot {
   public Bot(DiscordClient client) {
     this.client = client;
     createGuildManagers();
+    setPresence();
+  }
+
+  private void setPresence() {
+    client.getEventDispatcher().on(ReadyEvent.class)
+        .subscribe(event -> event.getClient().updatePresence(Presence.online(Activity.playing("!Help"))).subscribe());
   }
 
   private void createGuildManagers() {
@@ -27,7 +34,6 @@ public class Bot {
 
   private void login() {
     client.login().block();
-    client.updatePresence(Presence.online(Activity.playing("!Help")));
   }
 
   public static void main(String[] args) {
