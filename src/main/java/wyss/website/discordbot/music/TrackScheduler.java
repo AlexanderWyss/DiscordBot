@@ -93,9 +93,11 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
   }
 
   public void removeCurrentSong() {
-    audioTracks.remove(index);
-    index--;
-    next();
+    if (index >= 0) {
+      audioTracks.remove(index);
+      index--;
+      next();
+    }
   }
 
   public void resume() {
@@ -145,11 +147,7 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
   }
 
   public Audio getCurrentTrack() {
-    try {
-      return audioTracks.get(index);
-    } catch (IndexOutOfBoundsException e) {
-      return null;
-    }
+    return (Audio) player.getPlayingTrack();
   }
 
   public int getAmountOfSongsPreviously() {

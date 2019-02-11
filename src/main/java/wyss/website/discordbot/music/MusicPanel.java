@@ -1,8 +1,11 @@
 package wyss.website.discordbot.music;
 
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -16,9 +19,13 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
 import wyss.website.discordbot.GuildManager;
 
 public class MusicPanel implements Observer {
+
+  private static Map<Snowflake, MusicPanel> musicpanels = new ConcurrentHashMap<>();
 
   private static final String TITLE = "Music Panel";
   private static final String REPEATE_LIST = "\uD83D\uDD01";
@@ -40,9 +47,18 @@ public class MusicPanel implements Observer {
   private Map<ReactionEmoji, Consumer<GuildMusicManager>> controls = createControls();
   private CompletableFuture<Message> message;
 
+  private Optional<Disposable> removeSub = Optional.empty();
+  private Optional<Disposable> addSub = Optional.empty();
+  private Optional<Disposable> updateSub = Optional.empty();
+
   public MusicPanel(MessageChannel channel, GuildManager manager) {
     this.channel = channel;
     this.manager = manager;
+    Snowflake guildId = manager.getGuild().getId();
+    if (musicpanels.containsKey(guildId)) {
+      musicpanels.get(guildId).shutdown();
+    }
+    musicpanels.put(guildId, this);
   }
 
   private Map<ReactionEmoji, Consumer<GuildMusicManager>> createControls() {
@@ -78,11 +94,14 @@ public class MusicPanel implements Observer {
         message.addReaction(reaction).subscribe();
       }
     }).toFuture();
-    manager.on(ReactionAddEvent.class).subscribe(reactionEvent -> reactionRecieved(reactionEvent.getMessageId(),
-        reactionEvent.getUserId(), reactionEvent.getEmoji()));
-    manager.on(ReactionRemoveEvent.class).subscribe(reactionEvent -> reactionRecieved(reactionEvent.getMessageId(),
-        reactionEvent.getUserId(), reactionEvent.getEmoji()));
+    addSub = Optional
+        .of(manager.on(ReactionAddEvent.class).subscribe(reactionEvent -> reactionRecieved(reactionEvent.getMessageId(),
+            reactionEvent.getUserId(), reactionEvent.getEmoji())));
+    removeSub = Optional.of(
+        manager.on(ReactionRemoveEvent.class).subscribe(reactionEvent -> reactionRecieved(reactionEvent.getMessageId(),
+            reactionEvent.getUserId(), reactionEvent.getEmoji())));
     manager.getGuildMusicManager().getScheduler().addListener(this);
+    updateSub = Optional.of(Flux.interval(Duration.ofSeconds(10), Duration.ofSeconds(10)).subscribe(v -> update()));
   }
 
   private void reactionRecieved(Snowflake messageId, Snowflake userId, ReactionEmoji emoji) {
@@ -105,7 +124,8 @@ public class MusicPanel implements Observer {
         AudioTrackInfo info = currentTrack.getInfo();
         embed.addField("Title", (scheduler.isPaused() ? PAUSED : PLAYING) + " " + info.title, false);
         embed.addField("Author", info.author, false);
-        embed.addField("Duration", DurationFormatUtils.formatDuration(currentTrack.getDuration(), "mm:ss"), false);
+        embed.addField("Duration", DurationFormatUtils.formatDuration(currentTrack.getPosition(), "mm:ss") + "/"
+            + DurationFormatUtils.formatDuration(currentTrack.getDuration(), "mm:ss"), false);
       }
       embed.addField("Songs in queue", scheduler.getAmountOfSongsPreviously() + " played previously | "
           + scheduler.getAmountOfSongsInQueue() + " in Queue", false);
@@ -117,15 +137,15 @@ public class MusicPanel implements Observer {
   private String getRepeat(Repeat repeat) {
     String repeateContent;
     switch (repeat) {
-      case LIST:
-        repeateContent = REPEATE_LIST;
-        break;
-      case SONG:
-        repeateContent = REPEATE_SONG;
-        break;
-      default:
-        repeateContent = "None";
-        break;
+    case LIST:
+      repeateContent = REPEATE_LIST;
+      break;
+    case SONG:
+      repeateContent = REPEATE_SONG;
+      break;
+    default:
+      repeateContent = "None";
+      break;
     }
     return repeateContent;
   }
@@ -133,5 +153,13 @@ public class MusicPanel implements Observer {
   @Override
   public void update() {
     message.thenAccept(message -> message.edit(spec -> spec.setEmbed(build())).subscribe());
+  }
+
+  private void shutdown() {
+    manager.getGuildMusicManager().getScheduler().removeListener(this);
+    addSub.ifPresent(Disposable::dispose);
+    removeSub.ifPresent(Disposable::dispose);
+    updateSub.ifPresent(Disposable::dispose);
+    message.thenAccept(message -> message.delete().subscribe());
   }
 }
