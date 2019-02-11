@@ -9,7 +9,6 @@
     </File>
 	</Appenders>
 	<Loggers>
-		<Logger name="reactor.core.scheduler.Schedulers" level="FATAL" />
 		<Root level="trace">
 			<AppenderRef ref="Console" level="info" />
 			<AppenderRef ref="File" level="info"/>
