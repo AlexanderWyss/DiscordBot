@@ -44,7 +44,7 @@ public abstract class Command {
 
   @SuppressWarnings("serial")
   public static List<Command> list(GuildManager manager) {
-    return new ArrayList<>() {
+    return new ArrayList<Command>() {
       {
         add(new HelpCommand(manager));
         add(new PlayCommand(manager));

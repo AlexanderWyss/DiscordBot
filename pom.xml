@@ -15,9 +15,9 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.0</version>
 				<configuration>
-					<release>11</release>
-					<source>11</source>
-					<target>11</target>
+					<release>8</release>
+					<source>8</source>
+					<target>8</target>
 				</configuration>
 				<dependencies>
         			<dependency>
@@ -40,12 +40,12 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										wyss.website.discordbot.App
+										wyss.website.discordbot.Bot
 									</mainClass>
 								</manifest>
 							</archive> 
 							<descriptorRefs>
-								<descriptorRef>full</descriptorRef>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
 							</descriptorRefs>
 						</configuration>
 					</execution>
