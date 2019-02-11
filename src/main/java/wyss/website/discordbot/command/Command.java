@@ -10,6 +10,8 @@ import discord4j.core.spec.MessageCreateSpec;
 import reactor.core.publisher.Mono;
 import wyss.website.discordbot.GuildManager;
 import wyss.website.discordbot.command.general.HelpCommand;
+import wyss.website.discordbot.music.commands.JoinCommand;
+import wyss.website.discordbot.music.commands.LeaveCommand;
 import wyss.website.discordbot.music.commands.MusicPanelCommand;
 import wyss.website.discordbot.music.commands.PlayCommand;
 
@@ -52,6 +54,8 @@ public abstract class Command {
     list.add(new HelpCommand(manager));
     list.add(new PlayCommand(manager));
     list.add(new MusicPanelCommand(manager));
+    list.add(new JoinCommand(manager));
+    list.add(new LeaveCommand(manager));
     return list;
   }
 }
