@@ -101,7 +101,7 @@ public class MusicPanel implements Observer {
         manager.on(ReactionRemoveEvent.class).subscribe(reactionEvent -> reactionRecieved(reactionEvent.getMessageId(),
             reactionEvent.getUserId(), reactionEvent.getEmoji())));
     manager.getGuildMusicManager().getScheduler().addListener(this);
-    updateSub = Optional.of(Flux.interval(Duration.ofSeconds(10), Duration.ofSeconds(10)).subscribe(v -> update()));
+    updateSub = Optional.of(Flux.interval(Duration.ofSeconds(5), Duration.ofSeconds(5)).subscribe(v -> update()));
   }
 
   private void reactionRecieved(Snowflake messageId, Snowflake userId, ReactionEmoji emoji) {
