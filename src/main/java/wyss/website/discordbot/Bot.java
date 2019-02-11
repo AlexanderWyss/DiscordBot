@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
+import discord4j.core.object.presence.Activity;
+import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 
 public class Bot {
@@ -25,6 +27,7 @@ public class Bot {
 
   private void login() {
     client.login().block();
+    client.updatePresence(Presence.online(Activity.playing("!Help")));
   }
 
   public static void main(String[] args) {

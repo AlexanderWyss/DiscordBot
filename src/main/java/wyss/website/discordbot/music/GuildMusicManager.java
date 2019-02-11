@@ -12,17 +12,16 @@ import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.voice.VoiceConnection;
-import reactor.core.publisher.Mono;
 import wyss.website.discordbot.GuildManager;
 
 public class GuildMusicManager {
   private final TrackScheduler scheduler;
 
   private AudioLoader audioLoader;
-
   private GuildManager guildManager;
-
   private AudioPlayer player;
+
+  private Optional<VoiceConnection> voiceConnection = Optional.empty();
 
   public GuildMusicManager(AudioPlayerManager manager, GuildManager guildManager) {
     this.guildManager = guildManager;
@@ -31,14 +30,22 @@ public class GuildMusicManager {
     audioLoader = new AudioLoader(manager, scheduler);
   }
 
-  public Mono<VoiceConnection> join(VoiceChannel channel) {
-    return channel.join(spec -> spec.setProvider(new LavaplayerAudioProvider(player)));
+  public void join(VoiceChannel channel) {
+    channel.join(spec -> spec.setProvider(new LavaplayerAudioProvider(player)))
+        .subscribe(connection -> voiceConnection = Optional.of(connection));
   }
 
-  public Mono<VoiceConnection> join(Member member) {
-    return member.getVoiceState().flatMap(VoiceState::getChannel).filterWhen(
+  public void join(Member member) {
+    member.getVoiceState().flatMap(VoiceState::getChannel).filterWhen(
         channel -> channel.getGuild().map(channelGuild -> guildManager.getGuild().getId().equals(channelGuild.getId())))
-        .flatMap(this::join);
+        .subscribe(this::join);
+  }
+
+  public void leave() {
+    voiceConnection.ifPresent(connection -> {
+      connection.disconnect();
+      voiceConnection = Optional.empty();
+    });
   }
 
   public TrackScheduler getScheduler() {

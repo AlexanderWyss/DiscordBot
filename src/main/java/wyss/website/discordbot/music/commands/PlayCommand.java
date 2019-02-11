@@ -28,7 +28,7 @@ public class PlayCommand extends Command {
           getManager().getGuildMusicManager().getScheduler().clear();
           audioLoader.playNow(param, new MessageSender(param, event));
         }).execute(cutOffCommand(event), "now");
-    getManager().getGuildMusicManager().join(event.getMember().get()).subscribe();
+    getManager().getGuildMusicManager().join(event.getMember().get());
   }
 
   private final class MessageSender extends AbstractAudioLoadResultHandler {
