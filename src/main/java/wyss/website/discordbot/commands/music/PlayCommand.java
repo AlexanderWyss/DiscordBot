@@ -8,6 +8,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import wyss.website.discordbot.GuildManager;
 import wyss.website.discordbot.commands.Command;
+import wyss.website.discordbot.commands.Help;
 import wyss.website.discordbot.commands.Helper;
 import wyss.website.discordbot.music.AbstractAudioLoadResultHandler;
 import wyss.website.discordbot.music.AudioLoader;
@@ -57,13 +58,11 @@ public class PlayCommand extends Command {
   }
 
   @Override
-  public String getDescription() {
-    return "Adds a song or playlist to the current playlist at a position depending on the first parameter."
-        + " The identifier can be an URL or \"ytsearch:<query>\"";
+  public Help getHelp() {
+    return new Help(
+        "Adds a song or playlist to the current playlist at a position depending on the first parameter."
+            + " The identifier can be an URL or \"ytsearch:<query>\"",
+        "", "now(default)|next|queue|replace", "identifier");
   }
 
-  @Override
-  public String getParameterDescription() {
-    return "<now(default)|next|queue|replace> <identifier>";
-  }
 }

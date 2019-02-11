@@ -31,7 +31,7 @@ public abstract class Command {
 
   public String cutOffCommand(MessageCreateEvent event) {
     String message = event.getMessage().getContent().get();
-    return message.substring(identifier.length() + manager.getCommandPrefix().length()).trim();
+    return message.substring(identifier.length() + manager.getCommandExecutor().getPrefix().length()).trim();
   }
 
   protected Mono<Message> reply(MessageCreateEvent event, String message) {
@@ -42,19 +42,15 @@ public abstract class Command {
     return event.getMessage().getChannel().flatMap(channel -> channel.createMessage(message));
   }
 
+  public abstract void execute(MessageCreateEvent event);
+
+  public abstract Help getHelp();
+
   public static List<Command> list(GuildManager manager) {
     List<Command> list = new ArrayList<>();
     list.add(new HelpCommand(manager));
     list.add(new PlayCommand(manager));
     list.add(new MusicPanelCommand(manager));
     return list;
-  }
-
-  public abstract void execute(MessageCreateEvent event);
-
-  public abstract String getDescription();
-
-  public String getParameterDescription() {
-    return "";
   }
 }

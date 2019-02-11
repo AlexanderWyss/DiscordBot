@@ -1,5 +1,6 @@
 package wyss.website.discordbot.commands;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -13,17 +14,20 @@ public class HelpCommand extends Command {
 
   @Override
   public void execute(MessageCreateEvent event) {
-    String description = getManager().getCommands().stream()
-        .map(command -> getManager().getCommandPrefix() + command.getIdentifier() + " "
-            + command.getParameterDescription() + " - " + command.getDescription())
-        .collect(Collectors.joining(System.lineSeparator()));
+    CommandExecutor commandExecutor = getManager().getCommandExecutor();
+    String description = commandExecutor.getCommands().stream().map(command -> {
+      Help help = command.getHelp();
+      return commandExecutor.getPrefix() + command.getIdentifier() + " "
+          + Arrays.stream(help.getParameters()).collect(Collectors.joining("> <", "<", ">")) + " - "
+          + help.getShortDescription();
+    }).collect(Collectors.joining(System.lineSeparator()));
     reply(event,
         spec -> spec.setEmbed(specEmbed -> specEmbed.setTitle("Command - Description").setDescription(description)))
             .subscribe();
   }
 
   @Override
-  public String getDescription() {
-    return "Helps you :D";
+  public Help getHelp() {
+    return new Help("Helps you :D", "");
   }
 }

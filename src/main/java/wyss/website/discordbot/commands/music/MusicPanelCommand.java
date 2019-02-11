@@ -3,6 +3,7 @@ package wyss.website.discordbot.commands.music;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import wyss.website.discordbot.GuildManager;
 import wyss.website.discordbot.commands.Command;
+import wyss.website.discordbot.commands.Help;
 import wyss.website.discordbot.music.MusicPanel;
 
 public class MusicPanelCommand extends Command {
@@ -20,7 +21,7 @@ public class MusicPanelCommand extends Command {
   }
 
   @Override
-  public String getDescription() {
-    return "Displays a music control panel.";
+  public Help getHelp() {
+    return new Help("Displays a music control panel.", "");
   }
 }

@@ -1,53 +1,35 @@
 package wyss.website.discordbot;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.Event;
-import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Flux;
-import wyss.website.discordbot.commands.Command;
-import wyss.website.discordbot.commands.Helper;
+import wyss.website.discordbot.commands.CommandExecutor;
 import wyss.website.discordbot.music.GuildMusicManager;
 
 public class GuildManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GuildManager.class);
 
-  private static final String COMMAND_PREFIX = "!";
   private Guild guild;
   private DiscordClient client;
   private GuildMusicManager guildMusicManager;
 
-  private List<Command> commands = Command.list(this);
+  private CommandExecutor commandExecutor;
 
   public GuildManager(Guild guild) {
     this.guild = guild;
     client = guild.getClient();
     guildMusicManager = GuildMusicManager.build(this);
-    client.getEventDispatcher().on(MessageCreateEvent.class).filter(this::isGuild)
-        .filter(event -> event.getMessage().getContent().map(message -> message.startsWith(COMMAND_PREFIX)).get())
-        .subscribe(this::executeCommand);
-  }
-
-  private void executeCommand(MessageCreateEvent event) {
-    commands.stream().filter(commands(event)).forEach(command -> {
-      command.execute(event);
-      LOGGER.info("Executing command: {}", event.getMessage().getContent().get());
-    });
-  }
-
-  private Predicate<? super Command> commands(MessageCreateEvent event) {
-    return command -> Helper.matcherCaseInsensitive("^" + COMMAND_PREFIX + command.getIdentifier() + "\\b",
-        event.getMessage().getContent().orElse("")).find();
+    commandExecutor = new CommandExecutor(this, "!");
+    commandExecutor.listen();
   }
 
   @SuppressWarnings("unchecked")
@@ -62,10 +44,6 @@ public class GuildManager {
     }
   }
 
-  public String getCommandPrefix() {
-    return COMMAND_PREFIX;
-  }
-
   public Guild getGuild() {
     return guild;
   }
@@ -78,8 +56,8 @@ public class GuildManager {
     return guildMusicManager;
   }
 
-  public List<Command> getCommands() {
-    return commands;
+  public CommandExecutor getCommandExecutor() {
+    return commandExecutor;
   }
 
   public <T extends Event> Flux<T> on(Class<T> clazz) {
