@@ -1,4 +1,4 @@
-package wyss.website.discordbot.command.commands;
+package wyss.website.discordbot.command.general;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

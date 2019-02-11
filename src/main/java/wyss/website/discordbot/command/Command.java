@@ -9,7 +9,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.spec.MessageCreateSpec;
 import reactor.core.publisher.Mono;
 import wyss.website.discordbot.GuildManager;
-import wyss.website.discordbot.command.commands.HelpCommand;
+import wyss.website.discordbot.command.general.HelpCommand;
 import wyss.website.discordbot.music.commands.MusicPanelCommand;
 import wyss.website.discordbot.music.commands.PlayCommand;
 
