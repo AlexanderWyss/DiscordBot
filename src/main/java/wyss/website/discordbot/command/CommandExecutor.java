@@ -32,7 +32,12 @@ public class CommandExecutor {
 
   private void executeCommand(MessageCreateEvent event) {
     commands.stream().filter(commands(event)).forEach(command -> {
-      command.execute(event);
+      try {
+        command.execute(event);
+      } catch (Exception e) {
+        LOGGER.error("Exception in command: {}", command.getIdentifier());
+        LOGGER.error("Exception: ", e);
+      }
       LOGGER.info("Executing command: {}", event.getMessage().getContent().get());
     });
   }
