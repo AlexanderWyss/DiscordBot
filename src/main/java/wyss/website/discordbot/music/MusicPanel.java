@@ -124,6 +124,7 @@ public class MusicPanel implements Observer {
         AudioTrackInfo info = currentTrack.getInfo();
         embed.addField("Title", (scheduler.isPaused() ? PAUSED : PLAYING) + " " + info.title, false);
         embed.addField("Author", info.author, false);
+        embed.addField("URL", info.uri, false);
         embed.addField("Duration", DurationFormatUtils.formatDuration(currentTrack.getPosition(), "mm:ss") + "/"
             + DurationFormatUtils.formatDuration(currentTrack.getDuration(), "mm:ss"), false);
       }

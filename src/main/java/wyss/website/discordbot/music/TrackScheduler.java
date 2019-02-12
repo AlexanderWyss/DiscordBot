@@ -88,6 +88,15 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
     next();
   }
 
+  public boolean jumpToSong(int index) {
+    if (index >= 0 && index < audioTracks.size()) {
+      this.index = index - 1;
+      next();
+      return true;
+    }
+    return false;
+  }
+
   private void play(Audio track) {
     player.playTrack(track == null ? null : track.makeClone());
   }
@@ -156,6 +165,10 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
 
   public int getAmountOfSongsInQueue() {
     return audioTracks.size() - (index + 1);
+  }
+
+  public List<Audio> getAudioTracks() {
+    return audioTracks;
   }
 
   @Override
