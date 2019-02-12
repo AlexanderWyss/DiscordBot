@@ -16,9 +16,9 @@ public class MusicCommands extends Commands {
     commands.add(new PlayCommand(manager));
     commands.add(new MusicPanelCommand(manager));
     commands.add(new ListCommand(manager));
+    commands.add(new JumpToCommand(manager));
     commands.add(new NextCommand(manager));
     commands.add(new PreviousCommand(manager));
-    commands.add(new JumpToCommand(manager));
     commands.add(new PauseCommand(manager));
     commands.add(new ResumeCommand(manager));
     commands.add(new RemoveCommand(manager));
