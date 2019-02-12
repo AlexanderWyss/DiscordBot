@@ -1,7 +1,5 @@
 package wyss.website.discordbot.command;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -9,19 +7,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.spec.MessageCreateSpec;
 import reactor.core.publisher.Mono;
 import wyss.website.discordbot.GuildManager;
-import wyss.website.discordbot.command.general.HelpCommand;
-import wyss.website.discordbot.music.commands.ClearCommand;
-import wyss.website.discordbot.music.commands.JoinCommand;
-import wyss.website.discordbot.music.commands.LeaveCommand;
-import wyss.website.discordbot.music.commands.MusicPanelCommand;
-import wyss.website.discordbot.music.commands.NextCommand;
-import wyss.website.discordbot.music.commands.PauseCommand;
-import wyss.website.discordbot.music.commands.PlayCommand;
-import wyss.website.discordbot.music.commands.PreviousCommand;
-import wyss.website.discordbot.music.commands.RemoveCommand;
-import wyss.website.discordbot.music.commands.RepeatCommand;
-import wyss.website.discordbot.music.commands.ResumeCommand;
-import wyss.website.discordbot.music.commands.VolumeCommand;
 
 public abstract class Command {
   private GuildManager manager;
@@ -56,22 +41,4 @@ public abstract class Command {
   public abstract void execute(MessageCreateEvent event);
 
   public abstract Help getHelp();
-
-  public static List<Command> list(GuildManager manager) {
-    List<Command> list = new ArrayList<>();
-    list.add(new HelpCommand(manager));
-    list.add(new PlayCommand(manager));
-    list.add(new MusicPanelCommand(manager));
-    list.add(new JoinCommand(manager));
-    list.add(new LeaveCommand(manager));
-    list.add(new ClearCommand(manager));
-    list.add(new NextCommand(manager));
-    list.add(new PreviousCommand(manager));
-    list.add(new RepeatCommand(manager));
-    list.add(new PauseCommand(manager));
-    list.add(new ResumeCommand(manager));
-    list.add(new VolumeCommand(manager));
-    list.add(new RemoveCommand(manager));
-    return list;
-  }
 }
