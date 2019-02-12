@@ -27,6 +27,7 @@ public class MusicCommands extends Commands {
     commands.add(new VolumeCommand(manager));
     commands.add(new JoinCommand(manager));
     commands.add(new LeaveCommand(manager));
+    commands.add(new PlayListCommand(manager));
   }
 
   @Override

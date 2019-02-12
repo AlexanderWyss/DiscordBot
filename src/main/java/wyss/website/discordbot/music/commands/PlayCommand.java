@@ -2,6 +2,9 @@ package wyss.website.discordbot.music.commands;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -14,6 +17,8 @@ import wyss.website.discordbot.music.AbstractAudioLoadResultHandler;
 import wyss.website.discordbot.music.AudioLoader;
 
 public class PlayCommand extends Command {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(PlayCommand.class);
 
   public PlayCommand(GuildManager manager) {
     super(manager, "play");
