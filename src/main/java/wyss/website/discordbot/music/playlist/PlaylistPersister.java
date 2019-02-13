@@ -9,8 +9,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,7 +23,7 @@ public class PlaylistPersister {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PlaylistPersister.class);
 
-  private ConcurrentHashMap<String, Playlist> playlists;
+  private Map<String, Playlist> playlists;
   private Path directory;
   private Path path;
 
@@ -60,7 +60,7 @@ public class PlaylistPersister {
     return songs;
   }
 
-  public ConcurrentMap<String, Playlist> getPlaylists() {
+  public Map<String, Playlist> getPlaylists() {
     return playlists;
   }
 
@@ -106,10 +106,15 @@ public class PlaylistPersister {
 
   private static PlaylistPersister persistor;
 
-  public static PlaylistPersister get() throws URISyntaxException, IOException {
-    if (persistor == null) {
-      persistor = new PlaylistPersister(getDirectory());
-      persistor.loadPlaylists();
+  public static PlaylistPersister get() {
+    try {
+      LOGGER.info(getDirectory().toString());
+      if (persistor == null) {
+        persistor = new PlaylistPersister(getDirectory());
+        persistor.loadPlaylists();
+      }
+    } catch (URISyntaxException | IOException e) {
+      LOGGER.error("Exception: ", e);
     }
     return persistor;
   }

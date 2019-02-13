@@ -2,6 +2,7 @@ package wyss.website.discordbot.music;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
@@ -41,6 +43,10 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
     next();
   }
 
+  public void playNow(AudioPlaylist playlist) {
+    playNow(wrapAudio(playlist));
+  }
+
   public void playNext(Audio track) {
     audioTracks.add(index + 1, track);
   }
@@ -49,12 +55,24 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
     audioTracks.addAll(index + 1, playlist);
   }
 
+  public void playNext(AudioPlaylist playlist) {
+    playNext(wrapAudio(playlist));
+  }
+
   public void queue(Audio audio) {
     audioTracks.add(audio);
   }
 
   public void queue(List<Audio> playlist) {
     audioTracks.addAll(playlist);
+  }
+
+  public void queue(AudioPlaylist playlist) {
+    queue(wrapAudio(playlist));
+  }
+
+  private List<Audio> wrapAudio(AudioPlaylist playlist) {
+    return playlist.getTracks().stream().map(Audio::new).collect(Collectors.toList());
   }
 
   public void clear() {

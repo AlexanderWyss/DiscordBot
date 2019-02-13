@@ -2,11 +2,10 @@ package wyss.website.discordbot.music;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+
+import wyss.website.discordbot.music.playlist.Playlist;
 
 public class AudioLoader {
 
@@ -20,19 +19,7 @@ public class AudioLoader {
 
   public void playNow(String url, AbstractAudioLoadResultHandler audioLoadResultHandler) {
     manager.loadItemOrdered(url, url,
-        new ObservableAudioLoadResultHandler(Optional.ofNullable(audioLoadResultHandler)) {
-          @Override
-          public void trackLoaded(AudioTrack track) {
-            scheduler.playNow(new Audio(track));
-            super.trackLoaded(track);
-          }
-
-          @Override
-          public void playlistLoaded(AudioPlaylist playlist) {
-            scheduler.playNow(wrapAudio(playlist));
-            super.playlistLoaded(playlist);
-          }
-        });
+        new PlayNowAudioLoader(Optional.ofNullable(audioLoadResultHandler), url, scheduler));
   }
 
   public void playNow(String url) {
@@ -41,19 +28,7 @@ public class AudioLoader {
 
   public void playNext(String url, AbstractAudioLoadResultHandler audioLoadResultHandler) {
     manager.loadItemOrdered(url, url,
-        new ObservableAudioLoadResultHandler(Optional.ofNullable(audioLoadResultHandler)) {
-          @Override
-          public void trackLoaded(AudioTrack track) {
-            scheduler.playNext(new Audio(track));
-            super.trackLoaded(track);
-          }
-
-          @Override
-          public void playlistLoaded(AudioPlaylist playlist) {
-            scheduler.playNext(wrapAudio(playlist));
-            super.playlistLoaded(playlist);
-          }
-        });
+        new PlayNextAudioLoader(Optional.ofNullable(audioLoadResultHandler), url, scheduler));
   }
 
   public void playNext(String url) {
@@ -62,26 +37,46 @@ public class AudioLoader {
 
   public void queue(String url, AbstractAudioLoadResultHandler audioLoadResultHandler) {
     manager.loadItemOrdered(url, url,
-        new ObservableAudioLoadResultHandler(Optional.ofNullable(audioLoadResultHandler)) {
-          @Override
-          public void trackLoaded(AudioTrack track) {
-            scheduler.queue(new Audio(track));
-            super.trackLoaded(track);
-          }
-
-          @Override
-          public void playlistLoaded(AudioPlaylist playlist) {
-            scheduler.queue(wrapAudio(playlist));
-            super.playlistLoaded(playlist);
-          }
-        });
+        new QueueAudioLoader(Optional.ofNullable(audioLoadResultHandler), url, scheduler));
   }
 
   public void queue(String url) {
     queue(url, null);
   }
 
-  private List<Audio> wrapAudio(AudioPlaylist playlist) {
-    return playlist.getTracks().stream().map(Audio::new).collect(Collectors.toList());
+  public void playNow(Playlist playlist, AbstractAudioLoadResultHandler audioLoadResultHandler) {
+    List<String> songs = playlist.getSongs();
+    if (!songs.isEmpty()) {
+      playNow(songs.get(0), audioLoadResultHandler);
+      for (int i = songs.size() - 1; i > 0; i--) {
+        playNext(songs.get(i), audioLoadResultHandler);
+      }
+    }
+  }
+
+  public void playNow(Playlist playlist) {
+    playNow(playlist, null);
+  }
+
+  public void playNext(Playlist playlist, AbstractAudioLoadResultHandler audioLoadResultHandler) {
+    List<String> songs = playlist.getSongs();
+    for (int i = songs.size() - 1; i >= 0; i--) {
+      playNext(songs.get(i), audioLoadResultHandler);
+    }
+  }
+
+  public void playNext(Playlist playlist) {
+    playNext(playlist, null);
+  }
+
+  public void queue(Playlist playlist, AbstractAudioLoadResultHandler audioLoadResultHandler) {
+    List<String> songs = playlist.getSongs();
+    for (String string : songs) {
+      queue(string, audioLoadResultHandler);
+    }
+  }
+
+  public void queue(Playlist playlist) {
+    queue(playlist, null);
   }
 }

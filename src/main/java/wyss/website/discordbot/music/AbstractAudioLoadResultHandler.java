@@ -1,29 +1,24 @@
 package wyss.website.discordbot.music;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-public abstract class AbstractAudioLoadResultHandler implements AudioLoadResultHandler {
+public abstract class AbstractAudioLoadResultHandler {
 
-  @Override
-  public void trackLoaded(AudioTrack track) {
+  public void trackLoaded(AudioTrack track, String url) {
   }
 
-  @Override
-  public void playlistLoaded(AudioPlaylist playlist) {
+  public void playlistLoaded(AudioPlaylist playlist, String url) {
   }
 
-  @Override
-  public void noMatches() {
+  public void noMatches(String url) {
   }
 
-  @Override
-  public void loadFailed(FriendlyException exception) {
+  public void loadFailed(FriendlyException exception, String url) {
   }
 
-  public void loadSuccessful() {
+  public void loadSuccessful(String url) {
 
   }
 }

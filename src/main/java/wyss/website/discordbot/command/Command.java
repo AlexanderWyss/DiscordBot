@@ -30,11 +30,11 @@ public abstract class Command {
     return message.substring(identifier.length() + manager.getCommandExecutor().getPrefix().length()).trim();
   }
 
-  protected Mono<Message> reply(MessageCreateEvent event, String message) {
+  public static Mono<Message> reply(MessageCreateEvent event, String message) {
     return event.getMessage().getChannel().flatMap(channel -> channel.createMessage(message));
   }
 
-  protected Mono<Message> reply(MessageCreateEvent event, Consumer<MessageCreateSpec> message) {
+  public static Mono<Message> reply(MessageCreateEvent event, Consumer<MessageCreateSpec> message) {
     return event.getMessage().getChannel().flatMap(channel -> channel.createMessage(message));
   }
 

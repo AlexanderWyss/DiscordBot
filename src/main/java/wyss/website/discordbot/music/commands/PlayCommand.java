@@ -27,36 +27,34 @@ public class PlayCommand extends Command {
   @Override
   public void execute(MessageCreateEvent event) {
     AudioLoader audioLoader = getManager().getGuildMusicManager().getAudioLoader();
-    Helper.commandMapper().map("now", param -> audioLoader.playNow(param, new MessageSender(param, event)))
-        .map("next", param -> audioLoader.playNext(param, new MessageSender(param, event)))
-        .map("queue", param -> audioLoader.queue(param, new MessageSender(param, event))).map("replace", param -> {
+    Helper.commandMapper().map("now", param -> audioLoader.playNow(param, new MessageSender(event)))
+        .map("next", param -> audioLoader.playNext(param, new MessageSender(event)))
+        .map("queue", param -> audioLoader.queue(param, new MessageSender(event))).map("replace", param -> {
           getManager().getGuildMusicManager().getScheduler().clear();
-          audioLoader.playNow(param, new MessageSender(param, event));
+          audioLoader.playNow(param, new MessageSender(event));
         }).execute(cutOffCommand(event), "now");
     getManager().getGuildMusicManager().join(event.getMember().get());
   }
 
   private final class MessageSender extends AbstractAudioLoadResultHandler {
-    private final String url;
     private final CompletableFuture<Message> loadingMessage;
 
-    private MessageSender(String url, MessageCreateEvent event) {
-      this.url = url;
+    private MessageSender(MessageCreateEvent event) {
       this.loadingMessage = reply(event, "Loading...").toFuture();
     }
 
     @Override
-    public void loadSuccessful() {
+    public void loadSuccessful(String url) {
       loadingMessage.thenAccept(message -> message.delete().subscribe());
     }
 
     @Override
-    public void loadFailed(FriendlyException exception) {
+    public void loadFailed(FriendlyException exception, String url) {
       loadingMessage.thenAccept(message -> message.edit(spec -> spec.setContent(exception.getMessage())).subscribe());
     }
 
     @Override
-    public void noMatches() {
+    public void noMatches(String url) {
       loadingMessage
           .thenAccept(message -> message.edit(spec -> spec.setContent("No results found for: " + url)).subscribe());
     }
