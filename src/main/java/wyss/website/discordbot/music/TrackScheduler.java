@@ -107,15 +107,13 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
 
   public void previous() {
     if (index - 1 >= 0) {
-      index -= 2;
+      index--;
     } else {
       if (repeat.equals(Repeat.LIST)) {
-        index = audioTracks.size() - 2;
-      } else {
-        index--;
+        index = audioTracks.size() - 1;
       }
     }
-    next();
+    play();
   }
 
   public boolean jumpToSong(int index) {
@@ -134,8 +132,7 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
   public void removeCurrentSong() {
     if (index >= 0) {
       audioTracks.remove(index);
-      index--;
-      next();
+      play();
     }
   }
 
@@ -214,9 +211,10 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
   public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
     if (endReason.mayStartNext) {
       if (repeat.equals(Repeat.SONG)) {
-        index--;
+        play();
+      } else {
+        next();
       }
-      next();
     }
   }
 
