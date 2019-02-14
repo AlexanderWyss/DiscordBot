@@ -17,6 +17,10 @@ public class AudioLoader {
     this.scheduler = scheduler;
   }
 
+  public void load(String url, AbstractAudioLoadResultHandler audioLoadResultHandler) {
+    manager.loadItemOrdered(url, url, new ObservableAudioLoadResultHandler(Optional.of(audioLoadResultHandler), url));
+  }
+
   public void playNow(String url, AbstractAudioLoadResultHandler audioLoadResultHandler) {
     manager.loadItemOrdered(url, url,
         new PlayNowAudioLoader(Optional.ofNullable(audioLoadResultHandler), url, scheduler));

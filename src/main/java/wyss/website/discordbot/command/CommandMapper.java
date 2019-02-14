@@ -51,7 +51,7 @@ public class CommandMapper {
 
   private String getCommandPattern(boolean withDefault) {
     return "(?<command>" + Collections.list(commandMap.keys()).stream().collect(Collectors.joining("|")) + ")"
-        + (withDefault ? "?" : "");
+        + (withDefault ? "?" : "") + "[\\s$]";
   }
 
   public CommandMapper noParams() {

@@ -17,6 +17,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import discord4j.core.event.domain.message.MessageCreateEvent;
+import wyss.website.discordbot.command.Command;
 import wyss.website.discordbot.music.Audio;
 
 public class PlaylistPersister {
@@ -131,5 +133,23 @@ public class PlaylistPersister {
       songs.add(audio.getInfo().uri);
     }
     save(playlist);
+  }
+
+  public void save(MessageCreateEvent event, String name, List<Audio> audioTracks) {
+    try {
+      save(name, audioTracks);
+    } catch (PlayListNameException e) {
+      Command.reply(event, e.getMessage()).subscribe();
+    } catch (IOException e) {
+      Command.reply(event, "Save failed.");
+    }
+  }
+
+  public void save(MessageCreateEvent event, Playlist playlist) {
+    try {
+      save(playlist);
+    } catch (IOException e) {
+      Command.reply(event, "Save failed.");
+    }
   }
 }

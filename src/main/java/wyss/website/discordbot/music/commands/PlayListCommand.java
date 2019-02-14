@@ -1,6 +1,6 @@
 package wyss.website.discordbot.music.commands;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -19,7 +19,6 @@ import wyss.website.discordbot.command.Help;
 import wyss.website.discordbot.command.Helper;
 import wyss.website.discordbot.music.AbstractAudioLoadResultHandler;
 import wyss.website.discordbot.music.AudioLoader;
-import wyss.website.discordbot.music.playlist.PlayListNameException;
 import wyss.website.discordbot.music.playlist.Playlist;
 import wyss.website.discordbot.music.playlist.PlaylistPersister;
 
@@ -34,26 +33,35 @@ public class PlayListCommand extends Command {
   @Override
   public void execute(MessageCreateEvent event) {
     Helper.commandMapper().map("save", param -> {
-      try {
-        if (param != null && !param.isEmpty()) {
-          PlaylistPersister.get().save(param, getManager().getGuildMusicManager().getScheduler().getAudioTracks());
-        } else {
-          reply(event, "Please specify a name.").subscribe();
-        }
-      } catch (PlayListNameException e) {
-        reply(event, e.getMessage()).subscribe();
-      } catch (IOException e) {
-        reply(event, "Save failed.").subscribe();
-        LOGGER.error("Exception: ", e);
+      if (param != null && !param.isEmpty()) {
+        PlaylistPersister.get().save(event, param, getManager().getGuildMusicManager().getScheduler().getAudioTracks());
+      } else {
+        reply(event, "Please specify a name.").subscribe();
       }
-    }).map("list",
-        param -> reply(event,
-            spec -> spec.setEmbed(embed -> embed.setTitle("Playlists")
-                .setDescription(PlaylistPersister.get().getPlaylists().keySet().stream()
-                    .collect(Collectors.joining(System.lineSeparator()))))).subscribe())
-        .map("play", param -> play(param, event)).map("help", param -> printHelp())
-        .execute(cutOffCommand(event), "help");
-    getManager().getGuildMusicManager().join(event.getMember().get());
+    })//
+        .map("create", param -> PlaylistPersister.get().save(event, param, new ArrayList<>()))//
+        .map("list", param -> reply(event, "Playlists", getPlaylistsText()).subscribe())//
+        .map("add", param -> {
+          String[] params = param.split(" ", 2);
+          getPlaylist(event, params[0]).ifPresent(
+              playlist -> playlist.add(getManager().getGuildMusicManager().getAudioLoader(), event, params[1].trim()));
+        })//
+        .map("addList", param -> {
+          String[] params = param.split(" ", 2);
+          getPlaylist(event, params[0].trim()).ifPresent(playlist -> playlist
+              .addList(getManager().getGuildMusicManager().getAudioLoader(), event, params[1].trim()));
+        })//
+        .map("remove", param -> {
+          String[] params = param.split(" ", 2);
+          getPlaylist(event, params[0].trim()).ifPresent(playlist -> playlist.remove(event, params[1].trim()));
+        })//
+        .map("delete", param -> getPlaylist(event, param.trim()).ifPresent(playlist -> playlist.delete(event)))//
+        .map("play", param -> play(param, event))//
+        .execute(cutOffCommand(event), "list");
+  }
+
+  private String getPlaylistsText() {
+    return PlaylistPersister.get().getPlaylists().keySet().stream().collect(Collectors.joining(System.lineSeparator()));
   }
 
   private void play(String playCommand, MessageCreateEvent event) {
@@ -66,23 +74,20 @@ public class PlayListCommand extends Command {
           getManager().getGuildMusicManager().getScheduler().clear();
           loadPlaylist(event, param, audioLoader::playNow);
         }).execute(playCommand, "now");
+    getManager().getGuildMusicManager().join(event.getMember().get());
   }
 
   private void loadPlaylist(MessageCreateEvent event, String name, Consumer<? super Playlist> play) {
-    getPlaylist(name, event).ifPresent(play);
+    getPlaylist(event, name).ifPresent(play);
   }
 
-  private Optional<Playlist> getPlaylist(String name, MessageCreateEvent event) {
+  private Optional<Playlist> getPlaylist(MessageCreateEvent event, String name) {
     PlaylistPersister playlistPersister = PlaylistPersister.get();
     Optional<Playlist> playlist = Optional.ofNullable(playlistPersister.getPlaylists().get(name));
     if (!playlist.isPresent()) {
       reply(event, "No playlist found with name: " + name).subscribe();
     }
     return playlist;
-  }
-
-  private void printHelp() {
-    // TODO
   }
 
   @Override

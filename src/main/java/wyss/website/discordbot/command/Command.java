@@ -38,6 +38,10 @@ public abstract class Command {
     return event.getMessage().getChannel().flatMap(channel -> channel.createMessage(message));
   }
 
+  public static Mono<Message> reply(MessageCreateEvent event, String title, String text) {
+    return reply(event, spec -> spec.setEmbed(embed -> embed.setTitle(title).setDescription(text)));
+  }
+
   public abstract void execute(MessageCreateEvent event);
 
   public abstract Help getHelp();
