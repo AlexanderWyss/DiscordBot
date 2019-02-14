@@ -32,15 +32,17 @@ public class MusicPanel implements Observer {
   private static final String REPEATE_SONG = "\uD83D\uDD02";
   private static final String PLAYING = "\u25B6";
   private static final String PAUSED = "\u23F8";
-  public static final ReactionEmoji ARROW_BACK = ReactionEmoji.unicode("\u23EE");
-  public static final ReactionEmoji PAUSE_PLAY = ReactionEmoji.unicode("\u23EF");
-  public static final ReactionEmoji ARROW_FORWARD = ReactionEmoji.unicode("\u23ED");
-  public static final ReactionEmoji VOLUME_DOWN = ReactionEmoji.unicode("\uD83D\uDD09");
-  public static final ReactionEmoji VOLUME_UP = ReactionEmoji.unicode("\uD83D\uDD0A");
-  public static final ReactionEmoji REPEATE_LIST_EMOJI = ReactionEmoji.unicode(REPEATE_LIST);
-  public static final ReactionEmoji REPEATE_SONG_EMOJI = ReactionEmoji.unicode(REPEATE_SONG);
-  public static final ReactionEmoji DURATION = ReactionEmoji.unicode("\u231A");
-  public static final ReactionEmoji REMOVE = ReactionEmoji.unicode("\u274C");
+  private static final String SHUFFLE = "\uD83D\uDD00";
+  private static final ReactionEmoji ARROW_BACK = ReactionEmoji.unicode("\u23EE");
+  private static final ReactionEmoji PAUSE_PLAY = ReactionEmoji.unicode("\u23EF");
+  private static final ReactionEmoji ARROW_FORWARD = ReactionEmoji.unicode("\u23ED");
+  private static final ReactionEmoji VOLUME_DOWN = ReactionEmoji.unicode("\uD83D\uDD09");
+  private static final ReactionEmoji VOLUME_UP = ReactionEmoji.unicode("\uD83D\uDD0A");
+  private static final ReactionEmoji REPEATE_LIST_EMOJI = ReactionEmoji.unicode(REPEATE_LIST);
+  private static final ReactionEmoji REPEATE_SONG_EMOJI = ReactionEmoji.unicode(REPEATE_SONG);
+  private static final ReactionEmoji SHUFFLE_EMOJI = ReactionEmoji.unicode(SHUFFLE);
+  private static final ReactionEmoji REMOVE = ReactionEmoji.unicode("\u274C");
+
   private MessageChannel channel;
   private GuildManager manager;
 
@@ -70,8 +72,16 @@ public class MusicPanel implements Observer {
     map.put(VOLUME_UP, musicManager -> musicManager.getScheduler().volumeUp());
     map.put(REPEATE_LIST_EMOJI, toggleRepeatList());
     map.put(REPEATE_SONG_EMOJI, toggleRepeatSong());
+    map.put(SHUFFLE_EMOJI, toggleShuffle());
     map.put(REMOVE, musicManager -> musicManager.getScheduler().removeCurrentSong());
     return map;
+  }
+
+  private Consumer<GuildMusicManager> toggleShuffle() {
+    return musicManager -> {
+      TrackScheduler scheduler = musicManager.getScheduler();
+      scheduler.setShuffel(!scheduler.isShuffel());
+    };
   }
 
   private Consumer<GuildMusicManager> toggleRepeatSong() {
@@ -131,8 +141,19 @@ public class MusicPanel implements Observer {
       embed.addField("Songs in queue", scheduler.getAmountOfSongsPreviously() + " played previously | "
           + scheduler.getAmountOfSongsInQueue() + " in Queue", false);
       embed.addField("Volume", scheduler.getVolume() + "%", false);
-      embed.addField("Repeat", getRepeat(scheduler.getRepeat()), false);
+      embed.addField("Status", getShuffle(scheduler), false);
     };
+  }
+
+  private String getShuffle(TrackScheduler scheduler) {
+    String status = getRepeat(scheduler.getRepeat());
+    if (scheduler.isShuffel()) {
+      status += SHUFFLE;
+    }
+    if (status.trim().isEmpty()) {
+      status = "None";
+    }
+    return status;
   }
 
   private String getRepeat(Repeat repeat) {
@@ -145,7 +166,7 @@ public class MusicPanel implements Observer {
       repeateContent = REPEATE_SONG;
       break;
     default:
-      repeateContent = "None";
+      repeateContent = "";
       break;
     }
     return repeateContent;

@@ -24,6 +24,7 @@ public class MusicCommands extends Commands {
     commands.add(new RemoveCommand(manager));
     commands.add(new ClearCommand(manager));
     commands.add(new RepeatCommand(manager));
+    commands.add(new ShuffleCommand(manager));
     commands.add(new VolumeCommand(manager));
     commands.add(new JoinCommand(manager));
     commands.add(new LeaveCommand(manager));

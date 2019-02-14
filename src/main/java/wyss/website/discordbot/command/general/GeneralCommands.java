@@ -14,6 +14,7 @@ public class GeneralCommands extends Commands {
   public GeneralCommands(GuildManager manager) {
     super(manager);
     commands.add(new HelpCommand(getManager()));
+    commands.add(new NickCommand(getManager()));
   }
 
   @Override

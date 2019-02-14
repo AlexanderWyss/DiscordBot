@@ -2,6 +2,7 @@ package wyss.website.discordbot.music;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -26,6 +27,8 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
   private int index = -1;
 
   private Repeat repeat = Repeat.NONE;
+
+  private boolean shuffle = false;
 
   public TrackScheduler(AudioPlayer player) {
     this.player = player;
@@ -83,7 +86,12 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
 
   public void next() {
     if (index < audioTracks.size() - 1) {
-      play(audioTracks.get(++index));
+      if (shuffle) {
+        index = new Random().nextInt(audioTracks.size());
+      } else {
+        index++;
+      }
+      play(audioTracks.get(index));
       resume();
     } else {
       if (repeat.equals(Repeat.LIST)) {
@@ -187,6 +195,15 @@ public class TrackScheduler extends AudioEventAdapter implements Observer {
 
   public List<Audio> getAudioTracks() {
     return audioTracks;
+  }
+
+  public boolean isShuffel() {
+    return shuffle;
+  }
+
+  public void setShuffel(boolean shuffel) {
+    this.shuffle = shuffel;
+    updateAll();
   }
 
   @Override
