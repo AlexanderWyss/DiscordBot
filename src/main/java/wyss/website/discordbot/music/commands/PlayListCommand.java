@@ -92,7 +92,7 @@ public class PlayListCommand extends Command {
 
   @Override
   public Help getHelp() {
-    return new Help("WIP", "", "save", "name");
+    return new Help("WIP", "", "save|create|list|add|addList|remove|delete|play", "name", "(url)");
   }
 
   private final class MessageSender extends AbstractAudioLoadResultHandler {
