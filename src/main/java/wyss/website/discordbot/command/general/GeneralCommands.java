@@ -15,6 +15,7 @@ public class GeneralCommands extends Commands {
     super(manager);
     commands.add(new HelpCommand(getManager()));
     commands.add(new NickCommand(getManager()));
+    commands.add(new RebootCommand(getManager()));
   }
 
   @Override
