@@ -1,11 +1,7 @@
 package wyss.website.discordbot.music.playlist;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,26 +14,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import wyss.website.discordbot.Persister;
 import wyss.website.discordbot.command.Command;
 import wyss.website.discordbot.music.Audio;
 
-public class PlaylistPersister {
+public class PlaylistPersister extends Persister {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PlaylistPersister.class);
 
   private Map<String, Playlist> playlists;
-  private Path directory;
-  private Path path;
 
-  private PlaylistPersister(Path directory) {
-    this.directory = directory;
-    this.path = directory.resolve("playlists.json");
+  private PlaylistPersister() {
+    super("playlists.json");
   }
 
   public void loadPlaylists() throws IOException {
     playlists = new ConcurrentHashMap<>();
-    if (Files.exists(path)) {
-      JSONObject jsonObject = new JSONObject(new String(Files.readAllBytes(path)));
+    if (Files.exists(getPath())) {
+      JSONObject jsonObject = new JSONObject(readFile());
       JSONArray jsonPlaylists = jsonObject.getJSONArray("playlists");
       for (int i = 0; i < jsonPlaylists.length(); i++) {
         try {
@@ -72,15 +66,9 @@ public class PlaylistPersister {
   }
 
   public void save() throws IOException {
-    if (!Files.exists(path)) {
-      Files.createDirectories(directory);
-      Files.createFile(path);
-    }
     JSONObject jsonObject = new JSONObject();
     jsonObject.put("playlists", getPlayListsAsJson(playlists.values()));
-    try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-      writer.write(jsonObject.toString(2));
-    }
+    write(jsonObject);
   }
 
   private JSONArray getPlayListsAsJson(Collection<Playlist> playlists) {
@@ -106,24 +94,19 @@ public class PlaylistPersister {
     return jsonSongs;
   }
 
-  private static PlaylistPersister persistor;
+  private static PlaylistPersister persister;
 
   public static PlaylistPersister get() {
-    try {
-      LOGGER.info(getDirectory().toString());
-      if (persistor == null) {
-        persistor = new PlaylistPersister(getDirectory());
-        persistor.loadPlaylists();
+    LOGGER.info(getDefaultDirectory().toString());
+    if (persister == null) {
+      persister = new PlaylistPersister();
+      try {
+        persister.loadPlaylists();
+      } catch (IOException e) {
+        LOGGER.error("Exception: ", e);
       }
-    } catch (URISyntaxException | IOException e) {
-      LOGGER.error("Exception: ", e);
     }
-    return persistor;
-  }
-
-  private static Path getDirectory() throws URISyntaxException {
-    return Paths.get(PlaylistPersister.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent()
-        .resolve("discordbot");
+    return persister;
   }
 
   public void save(String name, List<Audio> audioTracks) throws PlayListNameException, IOException {
