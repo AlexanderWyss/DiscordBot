@@ -1,6 +1,12 @@
 package wyss.website.discordbot;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -29,9 +35,25 @@ public class Bot {
     client.login().block();
   }
 
-  public static void main(String[] args) {
-    Bot bot = new Bot(new DiscordClientBuilder("NDUzNDg0MjUwNTMzMTk5ODcz.D0B8aw.Rd1VgvMYTikvEdEDinsVpaa2x5E")
+  public static void main(String[] args) throws ParseException, IOException {
+    Settings settings = parseSettings(args);
+    Bot bot = new Bot(new DiscordClientBuilder(settings.getToken())
         .setInitialPresence(Presence.online(Activity.playing("!Help"))).build());
     bot.login();
+  }
+
+  private static Settings parseSettings(String[] args) throws ParseException, IOException {
+    Options options = new Options();
+    options.addOption("t", "token", true, "Set the discord token");
+    DefaultParser parser = new DefaultParser();
+    CommandLine cmd = parser.parse(options, args);
+    SettingsPersister settingsPersister = new SettingsPersister();
+    Settings settings;
+    if (cmd.hasOption("token")) {
+      settings = new Settings(cmd.getOptionValue("token"));
+      settingsPersister.save(settings);
+    }
+    settings = settingsPersister.loadSettings();
+    return settings;
   }
 }

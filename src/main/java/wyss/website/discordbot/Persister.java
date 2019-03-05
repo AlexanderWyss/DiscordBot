@@ -30,10 +30,11 @@ public abstract class Persister {
   }
 
   public static Path getDefaultDirectory() {
-    LOGGER.info(getDefaultDirectory().toString());
     try {
-      return Paths.get(PlaylistPersister.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent()
-          .resolve("discordbot");
+      Path directory = Paths.get(PlaylistPersister.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+          .getParent().resolve("discordbot");
+      LOGGER.info(directory.toString());
+      return directory;
     } catch (URISyntaxException e) {
       LOGGER.error("Exception: ", e);
       return null;

@@ -5,9 +5,9 @@ import java.nio.file.Files;
 
 import org.json.JSONObject;
 
-public class SettingsPersistor extends Persister {
+public class SettingsPersister extends Persister {
 
-  public SettingsPersistor() {
+  public SettingsPersister() {
     super("settings.json");
   }
 
