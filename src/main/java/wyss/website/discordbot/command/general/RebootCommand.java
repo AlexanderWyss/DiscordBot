@@ -16,7 +16,7 @@ public class RebootCommand extends Command {
   private static final Logger LOGGER = LoggerFactory.getLogger(PlayCommand.class);
 
   public RebootCommand(GuildManager manager) {
-    super(manager, "nick");
+    super(manager, "reboot");
   }
 
   @Override
@@ -31,6 +31,6 @@ public class RebootCommand extends Command {
 
   @Override
   public Help getHelp() {
-    return new Help("Nickes the bot", "", "name");
+    return new Help("Reboots the bot, use this for bug fixing", "");
   }
 }
